@@ -16,3 +16,7 @@ git clone -b master https://github.com/xiaoyekanren/scripts.git
 git tag -d [tag_name]  # 删除本地tag
 git push origin :refs/tags/[tag_name]  # 删除remote的tag
 ```
+5. git add 的反义词
+```
+git restore --staged
+```
