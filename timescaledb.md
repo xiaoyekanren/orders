@@ -1,3 +1,9 @@
+# 前言
+记录timescaledb的文档
+分布式参考链接：
+https://docs.timescale.com/timescaledb/latest/how-to-guides/multinode-timescaledb/
+https://www.bookstack.cn/read/TimescaleDB-2.1-en/9e03c38f765e20fe.md
+
 # 配置修改
 ## 1. pg配置
 ```
