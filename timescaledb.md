@@ -1,5 +1,5 @@
 # pg配置修改
-## vim /etc/postgresql/14/main/pg_hba.conf 
+>. vim /etc/postgresql/14/main/pg_hba.conf 
 host    all             all             0.0.0.0/0               trust  # 允许其他节点访问
 vim /etc/postgresql/14/main/postgresql.conf 
 listen_addresses = '0'  # 监听所有端口
