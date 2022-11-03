@@ -35,14 +35,10 @@ drop table example;
 # 删除数据库
 drop database example;
 # cli命令
-# 列出数据库
-\l  
-# 进入数据库
-\c  
-# 列出表
-\dt  
-# 显示扩展
-\dx  
+\l  # 列出数据库
+\c  # 进入数据库
+\dt  # 列出表
+\dx  # 显示扩展
 ```
 
 # 分布式操作
