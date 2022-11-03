@@ -1,16 +1,16 @@
 # 配置修改
-## pg配置
+## 1. pg配置
 ```
 vim /etc/postgresql/14/main/pg_hba.conf 
 host    all             all             0.0.0.0/0               trust  # 允许其他节点访问
 vim /etc/postgresql/14/main/postgresql.conf 
 listen_addresses = '0'  # 监听所有端口
 ```
-## 配置优化 单机，timescaledb （timescaledb-tune）
+## 2. 配置优化 单机，timescaledb （timescaledb-tune）
 ```
 timescaledb-tune -conf-path /etc/postgresql/14/main/postgresql.conf  --quiet
 ```
-## 配置优化，分布式 timescaledb
+## 3. 配置优化，分布式 timescaledb
 ```
 max_prepared_transactions = 150  # data nodes
 enable_partitionwise_aggregate = on  # access node
@@ -108,7 +108,7 @@ INSERT INTO example VALUES ('2020-12-14 13:45', 3, '90');
 ```
 select * from example;
 ```
-## 元数据操作
+## 6.元数据操作
 ```
 # 查询基于时间的间隔长度(微秒)
 SELECT h.table_name, c.interval_length FROM _timescaledb_catalog.dimension c JOIN _timescaledb_catalog.hypertable h ON h.id = c.hypertable_id;
