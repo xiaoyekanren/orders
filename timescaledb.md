@@ -15,6 +15,9 @@ pg_hba.conf加密方式为sha256的都要改成md5验证
 使用以下命令查询密码的认证方式
 ```
 SELECT rolpassword FROM pg_authid;
+```
+按如下修改改为md5验证
+```
 vim /etc/postgresql/14/main/postgresql.conf 
 listen_addresses = '0'  # 监听所有端口
 password_encryption = md5  # 用于benchmark连接
