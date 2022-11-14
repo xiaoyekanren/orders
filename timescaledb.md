@@ -24,7 +24,7 @@ password_encryption = md5  # 用于benchmark连接
 ```
 ## 2. 配置优化 单机，timescaledb （timescaledb-tune）
 ```
-timescaledb-tune -conf-path /etc/postgresql/14/main/postgresql.conf --quiet 
+timescaledb-tune -conf-path /etc/postgresql/14/main/postgresql.conf --quiet --yes
 ```
 ## 3. 配置优化，分布式 timescaledb
 ```
