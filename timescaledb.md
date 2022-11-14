@@ -74,7 +74,11 @@ SELECT add_data_node('node2', host => '172.20.31.69');
 # 第二种写法（最简单）
 SELECT add_data_node('node2', '172.20.31.69');
 # 完整
-SELECT add_data_node('node2','172.20.31.69','example',5432,	false,true,'123456') 
+SELECT add_data_node('node2','172.20.31.69','example',5432,	false,true,'123456');
+
+SELECT add_data_node('node3','172.20.31.16','example',5432,false,true,'123456');
+SELECT add_data_node('node3','172.20.31.17','example',5432,false,true,'123456');
+SELECT add_data_node('node3','172.20.31.18','example',5432,false,true,'123456');
 ```
 ## 2.1 查询数据节点
 ```
