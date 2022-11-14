@@ -19,7 +19,7 @@ SELECT rolpassword FROM pg_authid;
 按如下修改改为md5验证
 ```
 vim /etc/postgresql/14/main/postgresql.conf 
-listen_addresses = '0'  # 监听所有端口
+listen_addresses = '*'  # 监听所有端口
 password_encryption = md5  # 用于benchmark连接
 ```
 ## 2. 配置优化 单机，timescaledb （timescaledb-tune）
