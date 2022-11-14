@@ -40,11 +40,11 @@ default_transaction_isolation  # 没看懂咋修改...
 # 重启
 systemctl restart postgresql
 # 修改postgres用户密码
-ALTER USER postgres WITH PASSWORD 'postgres';
+ALTER USER postgres WITH PASSWORD '123456';
 # 创建数据库
 CREATE database example;
 # 创建timescaledb扩展
-\c example
+\c example;
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 # 进入cli
 su postgres -c 'psql -d example'
@@ -60,15 +60,7 @@ drop database example;
 ```
 
 # 分布式操作
-## 1. 创建基础表
-```
-CREATE TABLE example (
- time        TIMESTAMPTZ       NOT NULL,
- location    TEXT              NOT NULL,
- temperature DOUBLE PRECISION  NULL
-);
-```
-## 2. 添加数据节点
+## 1. 添加数据节点
 ```
 # SELECT add_data_node('node1', host => '172.20.31.67');
 SELECT add_data_node('node1', host => '172.20.31.68');
@@ -82,11 +74,11 @@ SELECT add_data_node('node3','172.20.31.16','example',5432,false,true,'123456');
 SELECT add_data_node('node3','172.20.31.17','example',5432,false,true,'123456');
 SELECT add_data_node('node3','172.20.31.18','example',5432,false,true,'123456');
 ```
-## 2.1 查询数据节点
+## 1.1 查询数据节点
 ```
 SELECT * FROM "timescaledb_information"."data_nodes";
 ```
-## 2.2 删除节点
+## 1.2 删除节点
 ```
 ## 迁移数据 (测试失败)
 CALL timescaledb_experimental.move_chunk('_timescaledb_internal._dist_hyper_1_1_chunk', 'node1', 'node2');
@@ -98,13 +90,22 @@ SELECT delete_data_node('node2', force => true);  # 强力删除
 # 删除节点，集群
 SELECT detach_data_node ( 'node1' , hypertable = > 'example' ); 
 ```
-## 2.3 将数据节点给到超级表（可选）
+## 1.3 将数据节点给到超级表（可选）
 ```
 # 创建表之后新增节点
 SELECT attach_data_node('node3', hypertable => 'hypertable_name');
 ```
-## 2.4 参考链接
+## 1.4 参考链接
 https://www.bookstack.cn/read/TimescaleDB-2.1-en/spilt.3.55581822f2599198.md
+## 2. 创建基础表
+```
+CREATE TABLE example (
+ time        TIMESTAMPTZ       NOT NULL,
+ location    TEXT              NOT NULL,
+ temperature DOUBLE PRECISION  NULL
+);
+```
+
 ## 3. 创建一个跨多个数据节点扩展的分布式超表
 ```
 SELECT create_distributed_hypertable('example', 'time', 'location');
