@@ -6,8 +6,8 @@
 IOTDB_HOME="/data/ubuntu/apache-iotdb-0.14.0-SNAPSHOT-all-bin"
 CONF_PATH=${IOTDB_HOME}/conf
 sed -i -e 's/^# enable_seq_space_compaction=.*/enable_seq_space_compaction=false/' ${CONF_PATH}/iotdb-common.properties
-sed -i -e 's/^# enable_unseq_space_compaction=.*/enable_seq_space_compaction=false/' ${CONF_PATH}/iotdb-common.properties
-sed -i -e 's/^# enable_cross_space_compaction=.*/enable_seq_space_compaction=false/' ${CONF_PATH}/iotdb-common.properties
+sed -i -e 's/^# enable_unseq_space_compaction=.*/enable_unseq_space_compaction=false/' ${CONF_PATH}/iotdb-common.properties
+sed -i -e 's/^# enable_cross_space_compaction=.*/enable_cross_space_compaction=false/' ${CONF_PATH}/iotdb-common.properties
 ```
 ### 加速合并
 ```
