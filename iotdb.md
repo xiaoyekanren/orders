@@ -22,6 +22,10 @@ sed -i -e 's/^# compaction_submission_interval_in_ms=.*/compaction_submission_in
 # 不限制合并速度
 sed -i -e 's/^# compaction_write_throughput_mb_per_sec=.*/compaction_write_throughput_mb_per_sec=0/' ${CONF_PATH}/iotdb-common.properties
 ```
+### 快速查看已启用的配置项
+```
+cat conf/iotdb-common.properties | grep -v '^$' | grep -v '^#.*$'
+```
 
 ## 文件处理
 ### 清理全部垃圾文件
