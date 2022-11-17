@@ -34,3 +34,7 @@ rm -rf LICENSE NOTICE README.md README_ZH.md RELEASE_NOTES.md docs grafana-metri
 # clear bat
 find ./ -name "*.bat" | xargs rm
 ```
+### 干死全部jps进程
+```
+jps | awk '{print $1}'|xargs kill -9
+```
