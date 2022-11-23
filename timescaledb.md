@@ -10,7 +10,7 @@ https://www.bookstack.cn/read/TimescaleDB-2.1-en/9e03c38f765e20fe.md
 vim /etc/postgresql/14/main/pg_hba.conf 
 host    all             all             0.0.0.0/0               trust  # 允许其他节点访问
 ```
-## 1.1 pg配置 for benchmark配置
+### 1.1 pg配置 for benchmark配置
 pg_hba.conf加密方式为sha256的都要改成md5验证
 使用以下命令查询密码的认证方式
 ```
@@ -22,11 +22,11 @@ vim /etc/postgresql/14/main/postgresql.conf
 listen_addresses = '*'  # 监听所有端口
 password_encryption = md5  # 用于benchmark连接
 ```
-## 2. 配置优化 单机，timescaledb （timescaledb-tune）
+### 1.2. 配置优化 单机，timescaledb （timescaledb-tune）
 ```
 timescaledb-tune -conf-path /etc/postgresql/14/main/postgresql.conf --quiet --yes
 ```
-## 3. 配置优化，分布式 timescaledb
+### 1.3. 配置优化，分布式 timescaledb
 ```
 max_prepared_transactions = 150  # data nodes
 enable_partitionwise_aggregate = on  # access node
