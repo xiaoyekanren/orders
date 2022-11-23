@@ -9,8 +9,9 @@ docker build -t apache/iotdb:0.12.4-node . -f Dockerfile-0.12.4-node
 ### 本地运行
 ```
 docker run -d -p 6667:6667 -p 31999:31999 -p 8181:8181 apache/iotdb:0.12.4-node
-
 # -d 是后台启动
+
+# 进入容器
 docker exec -it <CONTAINER ID> /bin/bash
 ```
 
