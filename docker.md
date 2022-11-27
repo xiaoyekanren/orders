@@ -10,11 +10,17 @@ docker build -t apache/iotdb:0.12.4-node . -f Dockerfile-0.12.4-node
 ```
 docker run -d -p 6667:6667 -p 31999:31999 -p 8181:8181 apache/iotdb:0.12.4-node
 # -d 是后台启动
+# -t 选项让Docker分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上
+# -i 则让容器的标准输入保持打开。
 
 # 进入容器
 docker exec -it <CONTAINER ID> /bin/bash
 ```
-
+### 查看容器详细信息
+```
+docker inspect
+# 可以查看IP
+```
 
 ## 发布
 ### 登录
