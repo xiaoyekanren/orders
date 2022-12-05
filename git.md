@@ -20,3 +20,8 @@ git push origin :refs/tags/[tag_name]  # 删除remote的tag
 ```
 git restore --staged xxx.file
 ```
+6. 修改commit信息
+```
+# git commit写错了
+git commit --amend
+```
