@@ -40,7 +40,7 @@ default_transaction_isolation  # 没看懂咋修改...
 # 重启
 systemctl restart postgresql
 # 修改postgres用户密码
-ALTER USER postgres WITH PASSWORD '123456';
+ALTER USER postgres WITH PASSWORD 'postgres';
 # 创建数据库
 CREATE database example;
 # 创建timescaledb扩展
@@ -68,16 +68,16 @@ SELECT add_data_node('node2', host => '172.20.31.69');
 # 第二种写法（最简单）
 SELECT add_data_node('node2', '172.20.31.69');
 # 完整
-SELECT add_data_node('node2','172.20.31.69','example',5432,	false,true,'123456');
+SELECT add_data_node('node2','172.20.31.69','example',5432,	false,true,'postgres');
 
 SELECT add_data_node('node1', '192.168.130.37');
 SELECT add_data_node('node2', '192.168.130.38');
 SELECT add_data_node('node3', '192.168.130.39');
 
 
-SELECT add_data_node('node1','192.168.130.37','example',5432,false,true,'123456');
-SELECT add_data_node('node2','192.168.130.38','example',5432,false,true,'123456');
-SELECT add_data_node('node3','192.168.130.39','example',5432,false,true,'123456');
+SELECT add_data_node('node1','192.168.130.37','example',5432,false,true,'postgres');
+SELECT add_data_node('node2','192.168.130.38','example',5432,false,true,'postgres');
+SELECT add_data_node('node3','192.168.130.39','example',5432,false,true,'postgres');
 ```
 ## 1.1 查询数据节点
 ```
