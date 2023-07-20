@@ -38,3 +38,22 @@ find ./ -name "*.bat" | xargs rm
 ```
 jps | awk '{print $1}'|xargs kill -9
 ```
+
+
+## 打包client-py的包
+```
+# 前置条件
+pip install setuptools
+pip install wheel
+# mvn编译打包
+#mvn package -pl client-py -am -DskipTests  # old version
+mvn package -pl iotdb-client/client-py -am -DskipTests
+# 打whl包
+cd iotdb-client/client-py/
+python setup.py bdist_wheel --universal
+# 安装whl包
+cd ./dist/
+pip3 install apache_iotdb-*.*.*-*.*-none-any.whl
+```
+
+
