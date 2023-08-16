@@ -25,3 +25,11 @@ git restore --staged xxx.file
 # git commit写错了
 git commit --amend
 ```
+7. 删除 git checkout 之后残留的跟当前分支无关的文件夹
+```
+# 清理无法删除的target文件夹
+find ./ -type d -name target | xargs rm -rf
+# git clean，-d删除文件夹，-f强制
+git clean -df
+
+```
