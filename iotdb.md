@@ -40,7 +40,7 @@ jps | awk '{print $1}'|xargs kill -9
 ```
 
 
-## 打包client-py的包
+## 打包client-p
 ```shell
 # 前置条件
 pip install setuptools
@@ -59,4 +59,18 @@ cd dist
 pip3 install apache_iotdb-*.*.*-*.*-none-any.whl
 ```
 
+## 打包client-cpp
+核心命令
+```
+./mvnw clean package -P with-tools,with-cpp -pl iotdb-client/client-cpp,example/client-cpp-example -am -DskipTests
+```
+1. windows
+
+2. mac
+```
+brew install flex
+brew install bison
+brew install openssl
+brew install boost
+```
 
