@@ -33,3 +33,19 @@ find ./ -type d -name target | xargs rm -rf
 git clean -df
 
 ```
+8. 代理
+```
+# 给当前仓库
+git config https.proxy http://127.0.0.1:7890
+git config http.proxy http://127.0.0.1:7890
+# 全局设置
+git config --global https.proxy http://127.0.0.1:7890
+git config --global https.proxy http://127.0.0.1:7890
+# 取消当前仓库
+git config --unset http.proxy
+git config --unset https.proxy
+# 取消全局
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+```
+
