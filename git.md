@@ -40,7 +40,7 @@ git clean -df
 git config https.proxy http://127.0.0.1:7890
 git config http.proxy http://127.0.0.1:7890
 # 全局设置
-git config --global https.proxy http://127.0.0.1:7890
+git config --global http.proxy http://127.0.0.1:7890
 git config --global https.proxy http://127.0.0.1:7890
 # 取消当前仓库
 git config --unset http.proxy
