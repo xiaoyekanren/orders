@@ -19,6 +19,7 @@ git push origin :refs/tags/[tag_name]  # 删除remote的tag
 5. git add 的反义词
 ```
 git restore --staged xxx.file
+git rm --cached *
 ```
 6. 修改commit信息
 ```
