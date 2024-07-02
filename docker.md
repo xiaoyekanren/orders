@@ -65,3 +65,33 @@ docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 -t apache
 # apache/iotdb:0.13.1-node
 docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 -t apache/iotdb:0.13.1-node -f Dockerfile-0.13.1-node . --push
 ```
+
+## 配置代理
+### 启动代理程序
+假设代理程序地址为http://127.0.0.1:7890
+### 新增配置文件
+```
+# 新增/修改 配置文件，写死docker的镜像为官方镜像
+# vim /etc/docker/daemon.json
+{
+ "registry-mirrors": [
+    "https://hub.docker.com/"]
+}
+
+# 创建文件夹
+mkdir /etc/systemd/system/docker.service.d
+
+# 新增文件
+# vim /etc/systemd/system/docker.service.d/proxy.conf
+[Service]
+Environment="HTTP_PROXY=http://127.0.0.1:7890"
+Environment="HTTPS_PROXY=http://127.0.0.1:7890"
+```
+### 重启docker
+```
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+
+
