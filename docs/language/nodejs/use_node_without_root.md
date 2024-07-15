@@ -1,4 +1,4 @@
-# 在mac上使用非root权限安装node.md
+# 在mac上使用非root权限安装node
 为了避免出现权限不足，可以将brew 安装的node改为手动安装的
 
 1. 清理node缓存
