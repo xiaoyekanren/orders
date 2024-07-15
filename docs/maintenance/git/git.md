@@ -1,34 +1,34 @@
 # git
 1. 获取当前分支的 commit id
-```
+``` shell
 git rev-parse --short HEAD  # 短
 git rev-parse HEAD  # 完整
 ```
 2. clone 代码到指定文件夹
-```
+``` shell
 git clone https://github.com/xiaoyekanren/scripts.git [path]
 ```
 3. clone 指定分支
-```
+``` shell
 git clone -b master https://github.com/xiaoyekanren/scripts.git
 ```
 4. tag
-```
+``` shell
 git tag -d [tag_name]  # 删除本地tag
 git push origin :refs/tags/[tag_name]  # 删除remote的tag
 ```
 5. git add 的反义词
-```
+``` shell
 git restore --staged xxx.file
 git rm --cached *
 ```
 6. 修改commit信息
-```
+``` shell
 # git commit写错了
 git commit --amend
 ```
 7. 删除 git checkout 之后残留的跟当前分支无关的文件夹
-```
+``` shell
 # 清理无法删除的target文件夹
 find ./ -type d -name target | xargs rm -rf
 # git clean，-d删除文件夹，-f强制
@@ -36,7 +36,7 @@ git clean -df
 
 ```
 8. 代理
-```
+``` shell
 # 给当前仓库
 git config https.proxy http://127.0.0.1:7890
 git config http.proxy http://127.0.0.1:7890

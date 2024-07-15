@@ -2,6 +2,7 @@
 
 ## 定时删除文件
 <details>
+<summary>点击查看代码</summary>
 
 ``` shell
 #/bin/bash
@@ -11,12 +12,6 @@ backup_path='/opt/data/backups'
 no_delete_quantity=30
 # 检查间隔
 check_interval=43200
-```
-
-<summary>点击查看代码</summary>
-
-
-```
 current_path=`pwd`
 # 判断文件夹内文件的数量，大于保留文件的数量就删，小于就等待下次判断
 check(){
@@ -46,6 +41,6 @@ while true;do
 	cd $current_path
 done
 ```
-
 </details>
 
+## 

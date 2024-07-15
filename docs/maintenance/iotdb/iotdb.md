@@ -61,13 +61,13 @@ pip3 install apache_iotdb-*.*.*-*.*-none-any.whl
 
 ## 打包client-cpp
 核心命令
-```
+``` shell
 ./mvnw clean package -P with-tools,with-cpp -pl iotdb-client/client-cpp,example/client-cpp-example -am -DskipTests
 ```
 1. windows
 
 2. mac
-```
+``` shell
 brew install flex
 brew install bison
 brew install openssl

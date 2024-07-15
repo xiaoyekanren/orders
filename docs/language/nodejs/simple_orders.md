@@ -1,6 +1,6 @@
 # 简单命令
 1. npm设置源
-```shell
+``` shell
 # 给npm设置国内源
 # 该步骤执行完之后，会将源的信息写到 /Users/$(whoami)/.npmrc 下
 npm config set registry https://registry.npmmirror.com
@@ -15,7 +15,7 @@ npm config get registry
 
 2. electron安装不上
 
-```shell
+``` shell
 # 切换electron的源为国内即可，以后下载electron 都会走这个地址
 # 参考链接https://www.electronjs.org/zh/docs/latest/tutorial/installation
 echo "ELECTRON_MIRROR=\"https://npmmirror.com/mirrors/electron/\"" >> ~/.zshrc
