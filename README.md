@@ -5,6 +5,7 @@ icon: home
 title: 这是主页
 heroText: 这是主页
 tagline: 学着吧！
+footer: true
 ---
 <!-- ## a
 abc
