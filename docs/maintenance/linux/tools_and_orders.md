@@ -149,7 +149,7 @@ ls -l /dev | grep cdrom  # 查看当前光盘
 mount /dev/cdrom1 /mnt/gp  #  将光盘cdrom1挂载到/mnt/gp下
 
 # 挂载 windows 共享硬盘
-mount -t cifs -o username=administrator,password='123' //192.168.130.181/share /share
+mount -t cifs -o username=administrator,password='123' //192.168.1.181/share /share
 ```
 
 ## 虚拟机不重启添加磁盘
@@ -180,10 +180,10 @@ ubuntu ALL=(ALL) NOPASSWD:ALL
 # vim /etc/network/interfices
 auto ens33  # 网卡名称，ip add / ifconfig 获得
 iface ens33 inet static  # 静态，如果dhcp只配置auto 和iface 2行即可
-address 192.168.130.222  # ip
+address 192.168.1.222  # ip
 netmask 255.255.255.0  # 子网
-gateway 192.168.130.1  # 网关
-dns-nameservers 192.168.130.1  # dns，空格分隔配置多个
+gateway 192.168.1.1  # 网关
+dns-nameservers 192.168.1.1  # dns，空格分隔配置多个
 
 # 重启网卡
 
@@ -210,9 +210,32 @@ ifdown <网卡>
 ```
 
 ### ubuntu>20
+这个是yaml，一定要注意格式。
 ``` shell
-
+# vim /etc/netplan/00-installer-config.yaml
+network:
+  ethernets:
+    eno1:  # 网卡
+      addresses:
+      - 192.168.1.5/24  # IP地址
+      gateway4: 192.168.1.254  # 网关
+      nameservers:
+        addresses:
+        - 166.111.8.28  # dns
+  version: 2
+# 使生效
+netplan apply
 ```
+
+ - 下面是如何配置dhcp
+``` shell
+network:
+  ethernets:
+    enp2s0:
+      dhcp4: true
+  version: 2
+```
+
 
 ## 临时修改dns
 重启网卡失效！重启失效！重启失效！
@@ -250,7 +273,7 @@ firewall-cmd --zone=public --remove-port=80/tcp --permanent  # 关闭端口
 ``` shell
 ufw allow 22
 ufw allow 22 comment 'Allow SSH connections'  # 带备注
-ufw allow proto tcp to 0.0.0.0/0 port 443 comment "20240223 gitlab temporary"  # 完整
+ufw allow proto tcp to 0.0.0.0/0 port 443 comment "this is comment"  # 完整
 
 # 重新加载
 ufw enable  # 启用ufw
