@@ -46,8 +46,42 @@ lsb_release -a
 ``` shell
 uname -a
 ```
+##  swap相关
 
-## 清理 swap
+### 删除swap
+
+``` shell
+# 1. 查看swap
+swapon --show
+# 2. 关闭swap
+swapoff /dev/dm-1
+# 3. 删除当前swap
+rm -rf /dev/dm-1
+# 4. 修改fstab文件，注释掉swap相关行
+vim /etc/fstab
+#LABEL=YUNIFYSWAP swap                    swap    defaults        0 0
+```
+
+### 创建swap
+
+``` shell
+# 1. 使用 fallocate 生成一个文件
+fallocate -l 32G /swapfile
+# 2. 设置权限为 600
+chmod 600 /swapfile
+# 3. 将文件标记为 swap
+mkswap /swapfile
+# 4. 开启 swap
+swapon /swapfile
+# 5. 开机自启动
+vim /etc/fstab
+/swapfile        none   swap    sw              0       0
+# 6. 查看swap
+swapon --show
+```
+
+
+## 清理 cache
 在 Linux 系统中，内存管理是通过内核自动完成的。内核会将未使用的内存用作缓存（cache）和缓冲区（buffers）以提高系统性能。缓存和缓冲区是用来临时存储数据，以便快速访问。
 
 缓存（Cache）：通常指的是用来存储读取的文件系统数据的内存区域。当文件被读取时，它们的数据会被存储在缓存中，以便下次访问时能更快地读取。
@@ -116,7 +150,6 @@ mount /dev/cdrom1 /mnt/gp  #  将光盘cdrom1挂载到/mnt/gp下
 
 # 挂载 windows 共享硬盘
 mount -t cifs -o username=administrator,password='123' //192.168.130.181/share /share
-
 ```
 
 ## 虚拟机不重启添加磁盘
@@ -124,14 +157,11 @@ mount -t cifs -o username=administrator,password='123' //192.168.130.181/share /
 for i in `ls /sys/class/scsi_host/*/scan`; do echo "- - -" > $i; done
 ```
 
-
 ## 显卡 GPU
 ``` shell 
 # 查看是否有nvidia的GPU
 lspci | grep -i nvidia
 ```
-
-
 
 
 ## sudo 权限
@@ -143,3 +173,93 @@ ubuntu	ALL=(ALL:ALL) ALL
 # sudo 免root密码
 ubuntu ALL=(ALL) NOPASSWD:ALL
 ```
+
+## 网卡配置
+### ubuntu16
+``` shell
+# vim /etc/network/interfices
+auto ens33  # 网卡名称，ip add / ifconfig 获得
+iface ens33 inet static  # 静态，如果dhcp只配置auto 和iface 2行即可
+address 192.168.130.222  # ip
+netmask 255.255.255.0  # 子网
+gateway 192.168.130.1  # 网关
+dns-nameservers 192.168.130.1  # dns，空格分隔配置多个
+
+# 重启网卡
+
+```
+
+### centos7
+``` shell
+# vim /etc/sysconfig/network-scripts/ifcfg-<enoxxxxx>
+DEVICE="eth0"  # 设备名称
+BOOTPROTO="static"  # 静态ip
+ONBOOT="yes"  # 开机自启
+TYPE="Ethernet"  # 网络类型
+IPADDR="192.168.1.122"  # IP地址
+GATEWAY="192.168.1.1"  # 网关
+NETMASK="255.255.255.0"  # 子网掩码
+DNS1=192.168.1.1  # dns
+
+# 重启所有
+/etc/init.d/netowrk restart
+
+# 重启单个
+ifup <网卡>
+ifdown <网卡>
+```
+
+### ubuntu>20
+``` shell
+
+```
+
+## 临时修改dns
+重启网卡失效！重启失效！重启失效！
+``` shell
+# vim /etc/resolv.conf
+nameserver 114.114.114.114
+```
+
+## 防火墙
+### centos
+``` shell
+# 启停
+systemctl start firewalld  # 启动
+systemctl status firewalld  # 查看状态
+systemctl disable firewalld  # 停止
+systemctl stop firewalld  # 禁用
+firewall-cmd --reload  # 重载防火墙规则
+
+# 配置
+firewall-cmd --zone=public --list-ports   查看所有打开的端口
+firewall-cmd --get-active-zones           查看区域信息
+firewall-cmd --get-zone-of-interface=eth0 查看指定接口所属区域
+
+# 开放/关闭
+firewall-cmd --zone=public --list-ports  # 查看所有打开的端口
+firewall-cmd --zone=public --query-port=80/tcp  # 查看端口状态
+
+firewall-cmd --zone=public --add-port=8080/tcp --permanent  # 开放端口
+firewall-cmd --zone=public --remove-port=80/tcp --permanent  # 关闭端口
+  # --permanent 永久生效，没有此参数重启后失效
+
+```
+
+### ubuntu
+``` shell
+ufw allow 22
+ufw allow 22 comment 'Allow SSH connections'  # 带备注
+ufw allow proto tcp to 0.0.0.0/0 port 443 comment "20240223 gitlab temporary"  # 完整
+
+# 重新加载
+ufw enable  # 启用ufw
+ufw disable  # 关闭ufw
+ufw reload  # 重载参数
+
+# 删除规则
+ufw status numbered  # 查看规则的index编号
+ufw delete [1]  # 按照编号删除规则
+```
+
+
