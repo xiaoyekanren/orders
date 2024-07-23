@@ -285,4 +285,80 @@ ufw status numbered  # 查看规则的index编号
 ufw delete [1]  # 按照编号删除规则
 ```
 
+## ulimit 相关
+ulimit 用于控制用户级别的资源限制
 
+``` shell
+# 显示所有的可配置的值
+ulimit -a
+# 查看单项，例如最大打开文件数量
+ulimit -n
+# 当前shell生效，调整最大文件打开数量
+ulimit -n 102400
+```
+
+永久生效需要编辑文件```/etc/security/limits.conf```后重启shell生效。
+``` shell
+# 设置最大进程数
+* soft nproc 102400
+* hard nproc 102400
+
+# 设置最大文件打开数
+* soft nofile 102400
+* hard nofile 102400
+```
+
+注1：* 表示所有用户，@ 代表所有组。  
+注2：ubuntu20上，* 不包含root，root需指定root才生效。  
+注3：通过 SSH 登录的用户，确保 sshd 守护进程配置中的 UsePAM 设置为 yes，否则不生效。
+
+## 进程绑定CPU
+taskset 用于设置或查找一个进程的 CPU 亲和性。  
+``` shell
+# 指定pid，查看该pid所绑定CPU
+taskset -p 2726
+
+# 启动程序时绑定CPU
+taskset -c 1 sleep 3  # 在CPU1上运行sleep 3秒
+
+# 改变现有程序绑定的CPU，两种写法都行
+taskset -pc 0,3,7-11 2726
+taskset -c 0,3,7-11 -p 2726
+
+```
+补充：查看绑定CPU的输出结果是十六进制，要将这个值转成二进制，之后从右往左每一位数代表一个CPU，值1表示该pid允许在该CPU运行，值0表示不允许。  
+例如1：返回5，二进制是101，CPU0、CPU2允许运行，CPU1不允许运行。  
+例如2：返回4，二进制是100，只允许在CPU2上运行。  
+例如3：返回f，二进制是1111，允许在CPU0-3上执行。  
+
+
+## 压缩
+### tar
+
+### gzip
+
+### zip/unzip
+
+### 7z
+需要安装，安装方式```sudo apt-get install p7zip-full -y```
+
+
+``` shell
+# 压缩
+7z a archive.7z file1 file2 dir1/
+# a：压缩
+# archive.7z：压缩后的文件名
+# "file1 file2 dir1/"：压缩的内容
+
+#  解压缩
+7z x archive.7z
+# x：解压缩
+
+# 其他命令：
+# l：表示列出压缩包内容，L的小写
+# t：验证文件完整性
+
+# 其他参数：
+# -o./：指定路径(后无空格)
+# -t7z，指定压缩格式7z(后无空格)
+```
