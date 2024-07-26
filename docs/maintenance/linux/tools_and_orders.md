@@ -424,3 +424,7 @@ dpkg -L tree
 # /usr/share/man/man1/tree.1.gz
 ```
 
+### centos - yum
+cengos7 和 8 都无啦，https://blog.centos.org/2023/04/end-dates-are-coming-for-centos-stream-8-and-centos-linux-7/
+#### 切换国内源
+阿里云源参考地址：https://developer.aliyun.com/mirror/centos/
