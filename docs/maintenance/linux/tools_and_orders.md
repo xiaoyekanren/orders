@@ -1,6 +1,8 @@
 # 常用工具和命令
 
-## 查看内存
+## 查看 系统/硬件 信息
+
+### 查看内存
 ``` shell
 # 查看内存详细信息
 dmidecode -t memory
@@ -13,13 +15,13 @@ dmidecode|grep -A16 "Memory Device"
 dmidecode|grep -A16 "Memory Device"|grep 'Speed'
  ```
 
-## 查看网卡
+### 查看网卡
 查看当前网卡是千兆还是百兆
 ``` shell
 ethtool eth1
 ```
 
-## 查看硬盘
+### 查看硬盘
 ``` shell
 # 机械硬盘
 apt-get install smartmontools -y
@@ -33,7 +35,7 @@ nvme list
 lsblk
 ```
 
-## 查看操作系统版本
+### 查看操作系统版本
 ``` shell
 # Centos
 cat /etc/redhat-release
@@ -42,10 +44,11 @@ cat /etc/issue
 lsb_release -a
 ```
 
-## 查看操作系统内核版本
+### 查看操作系统内核版本
 ``` shell
 uname -a
 ```
+
 ##  swap相关
 
 ### 删除swap
@@ -300,12 +303,15 @@ ulimit -n 102400
 永久生效需要编辑文件```/etc/security/limits.conf```后重启shell生效。
 ``` shell
 # 设置最大进程数
-* soft nproc 102400
+* soft nproc 102400  # 任何用户可以打开的最大进程数
 * hard nproc 102400
 
 # 设置最大文件打开数
-* soft nofile 102400
+* soft nofile 102400  # 任何用户可以打开的最大的文件描述符数量，默认1024，会限制tcp连接
 * hard nofile 102400
+
+# soft是一个警告值
+# hard是一个真正意义的阀值，超过就会报错
 ```
 
 注1：* 表示所有用户，@ 代表所有组。  
@@ -362,3 +368,59 @@ taskset -c 0,3,7-11 -p 2726
 # -o./：指定路径(后无空格)
 # -t7z，指定压缩格式7z(后无空格)
 ```
+
+## lsof
+### 查看已经删除，尚未释放的文件
+可以看到被打上deleted的文件，在pid被关闭的时候就会释放。用于debug删除文件但是磁盘空间未释放。
+``` shell
+lsof |grep deleted
+```
+
+## 性能测试工具
+### 硬盘测试工具 dd
+
+``` shell
+dd if=/dev/zero of=test1 bs=25MB count=80 oflag=direct   # 写
+dd if=test1 of=/dev/null iflag=direct  # 读
+dd if=/dev/sda of=/testrw.db bs=4k  # 同时读写
+
+if  # 指定读取的文件
+of  # 指定写入的文件
+bs  # 写入&输出的块大小，ibs=读，obs=写
+count  # 写入的块数量
+conv=fsync  # dd命令执行到最后会执行一次sync
+oflag＝direct  # 测速貌似要加这个
+
+#/dev/zero  # 零设备，可提供无限的空字符
+```
+conv=fsync: 表示把文件的“数据”和“metadata”都写入磁盘（metadata包括size、访问时间st_atime & st_mtime等等），因为文件的数据和metadata通常存在硬盘的不同地方，因此fsync至少需要两次IO写操作。 
+
+oflag=dsync 每个block size都单独写一次磁盘，使用同步I/O，去除caching的影响，这是最慢的一种方式，可以当成是模拟数据库插入操作。  
+
+oflag=direct,nonblock 避掉文件系统cache,直接读写,不使用buffer cache
+
+## 包管理工具
+### ubuntu - apt
+
+#### 查看使用apt安装的文件的位置
+``` shell
+dpkg -L <package>
+
+# eg:
+dpkg -L tree
+# /.
+# /usr
+# /usr/bin
+# /usr/bin/tree
+# /usr/share
+# /usr/share/doc
+# /usr/share/doc/tree
+# /usr/share/doc/tree/README.gz
+# /usr/share/doc/tree/TODO
+# /usr/share/doc/tree/changelog.Debian.gz
+# /usr/share/doc/tree/copyright
+# /usr/share/man
+# /usr/share/man/man1
+# /usr/share/man/man1/tree.1.gz
+```
+
