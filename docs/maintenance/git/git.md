@@ -1,4 +1,4 @@
-# git
+# Git
 1. 获取当前分支的 commit id
 ``` shell
 git rev-parse --short HEAD  # 短

@@ -1,4 +1,4 @@
-# nginx
+# Nginx
 
 ## build in ubuntu
 ``` shell
