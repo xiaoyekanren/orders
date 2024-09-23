@@ -111,6 +111,14 @@ Environment="HTTPS_PROXY=http://127.0.0.1:7890"
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
+### 完整删除docke
+``` shell
+systemctl stop docker
+sudo apt-get purge docker-ce docker-ce-cli containerd.io
+sudo rm -rf /var/lib/docker
+sudo rm -rf /var/lib/containerd
+sudo rm -rf /etc/docker/daemon.json
+sudo rm -rf /etc/systemd/system/docker.service
+sudo rm -rf /etc/systemd/system/docker.socket
 
-
-
+```
