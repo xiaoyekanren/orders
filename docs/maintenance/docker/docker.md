@@ -111,7 +111,7 @@ Environment="HTTPS_PROXY=http://127.0.0.1:7890"
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
-### 完整删除docke
+### 完整删除docker
 ``` shell
 systemctl stop docker
 sudo apt-get purge docker-ce docker-ce-cli containerd.io
