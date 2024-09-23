@@ -67,10 +67,28 @@ docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 -t apache
 docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 -t apache/iotdb:0.13.1-node -f Dockerfile-0.13.1-node . --push
 ```
 
-## 配置代理
-### 启动代理程序
+## 安装相关
+### 安装
+官方提供安装脚本，直接使用即可，apt-get install 失败时需要配置 HTTPS_PROXY。
+``` shell
+wget https://get.docker.com https://get.docker.com -O get-docker.sh 
+chmod +x get-docker.sh
+./get-docker.sh
+``` 
+### 修改数据目录
+``` shell
+# vim /usr/lib/systemd/system/docker.service
+# ExecStart行末尾，追加下面内容
+ --graph=/data/docker
+
+# 202409，新版docker参数改为了如下：
+ --data-root=/data/docker
+```
+
+### 配置代理
+#### 启动代理程序
 假设代理程序地址为http://127.0.0.1:7890
-### 新增配置文件
+#### 新增配置文件
 ``` shell
 # 新增/修改 配置文件，写死docker的镜像为官方镜像
 # vim /etc/docker/daemon.json
@@ -88,7 +106,7 @@ mkdir /etc/systemd/system/docker.service.d
 Environment="HTTP_PROXY=http://127.0.0.1:7890"
 Environment="HTTPS_PROXY=http://127.0.0.1:7890"
 ```
-### 重启docker
+#### 重启docker
 ``` shell
 sudo systemctl daemon-reload
 sudo systemctl restart docker
