@@ -105,6 +105,7 @@ mkdir /etc/systemd/system/docker.service.d
 [Service]
 Environment="HTTP_PROXY=http://127.0.0.1:7890"
 Environment="HTTPS_PROXY=http://127.0.0.1:7890"
+Environment="NO_PROXY=localhost,127.0.0.1,10.10.0.0/16,10.20.0.0/16"
 ```
 #### 重启docker
 ``` shell

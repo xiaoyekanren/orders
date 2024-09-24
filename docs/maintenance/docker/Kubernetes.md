@@ -1,17 +1,17 @@
 # Kubernetes
 ## 安装
-记录安装日期：20240924  
-版本：1.31  
-使用containerd  
-基于 ubuntu22.04.5   
+ - 记录安装日期：20240924   
+ - 版本：1.31  
+ - 使用containerd   
+ - 基于 ubuntu22.04.5   
 
 ### 前置
 1. 关闭swap  
 2. 配置hostname & 免密   
 3. 配置时间同步   
 4. 加载内核模块   
-overlay: 这是用于 OverlayFS 的模块，Kubernetes 使用它来管理容器文件系统。  
-br_netfilter: 这是用于支持网络过滤的模块，Kubernetes 需要它来处理网络流量。
+ - overlay: 这是用于 OverlayFS 的模块，Kubernetes 使用它来管理容器文件系统。    
+ - br_netfilter: 这是用于支持网络过滤的模块，Kubernetes 需要它来处理网络流量。  
 ``` shell
 # vim /etc/modules-load.d/k8s.conf
 overlay
@@ -24,9 +24,9 @@ lsmod | grep -e "overlay" -e "br_netfilter"
 ```
 
 5. 开启转发  
-net.bridge.bridge-nf-call-iptables=1: 允许 iptables 处理通过桥接网络接口的流量。  
-net.bridge.bridge-nf-call-ip6tables=1: 允许 ip6tables 处理通过桥接网络接口的 IPv6 流量。  
-net.ipv4.ip_forward=1: 允许 IPv4 数据包转发。  
+ - net.bridge.bridge-nf-call-iptables=1: 允许 iptables 处理通过桥接网络接口的流量。  
+ - net.bridge.bridge-nf-call-ip6tables=1: 允许 ip6tables 处理通过桥接网络接口的 IPv6 流量。  
+ - net.ipv4.ip_forward=1: 允许 IPv4 数据包转发。  
 ``` shell
 # vim /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-iptables=1
@@ -89,7 +89,9 @@ sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.9"
 
 ### kubectl & kubeadm & kubelet 安装
 #### 安装
-使用阿里云源，https://developer.aliyun.com/mirror/kubernetes
+使用阿里云的文档来安装最新版，文档里只写到了1.29，可通过浏览[地址](https://mirrors.aliyun.com/kubernetes-new/core/stable/)，确定最新版本  
+
+文档：https://developer.aliyun.com/mirror/kubernetes  
 ``` shell
 apt-get update && apt-get install -y apt-transport-https
 
@@ -135,15 +137,14 @@ kubeadm config images list --image-repository registry.aliyuncs.com/google_conta
 ## crictl images
 ```
 
-### 集群配置
-#### 配置文件
-1. 生成配置文件
+### 集群配置  
+#### 配置文件  
+1. 生成配置文件  
 ``` shell
 kubeadm config print init-defaults > init.yaml
 ```
 
-2. 修改配置文件
-
+2. 修改配置文件  
 ``` shell
 localAPIEndpoint:
 # advertiseAddress: 1.2.3.4
@@ -163,18 +164,57 @@ serviceSubnet: 10.10.0.0/16
 podSubnet: 10.20.0.0/16
 ```
 
-3. 初始化集群
+3. 初始化集群  
 ``` shell
 kubeadm init --config init.yaml 
 ```
+注意安装完成之后的信息！
+``` shell 
+Your Kubernetes control-plane has initialized successfully!
 
-4. 加入其他节点
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as ro
+
+kubeadm join 172.20.31.86:6443 --token abcdef.0123456789abcdef \
+	--discovery-token-ca-cert-hash sha256:45ce1bdeeb264124fc1b02193e86f37bbdc4
+```
+
+4. 拷贝集群配置文件 & 新增环境变量  
+``` shell
+# 拷贝配置文件
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# 新增环境变量
+# vim ~/.bashrc
+export KUBECONFIG=/etc/kubernetes/admin.conf
+
+# 使环境变量生效
+source KUBECONFIG=/etc/kubernetes/admin.conf
+```
+
+5. 加入其他节点  
+**注意：只有这一步是要在其他节点执行的，其他全部在主节点执行。**  
 ``` shell
 kubeadm join 172.20.31.86:6443 --token abcdef.0123456789abcdef \
 	--discovery-token-ca-cert-hash sha256:xxxxxx
 ```
 
-5. 查看集群状态
+6. 查看集群状态  
 ``` shell
 # 查看节点状态
 # 如下所示， Status是NotReady
@@ -202,7 +242,7 @@ kube-scheduler-a86            1/1     Running   0          13m
 文档： https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart  
 版本：3.28  
 
-1. 下载yaml
+1. 下载yaml  
 ``` shell
 # tigera-operator
 wget https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/tigera-operator.yaml
@@ -210,7 +250,7 @@ wget https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/ti
 wget https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/custom-resources.yaml
 ``` 
 
-2. 部署tigera-operator
+2. 部署tigera-operator  
 ``` shell
 kubectl create -f tigera-operator.yaml
 
@@ -227,10 +267,11 @@ tigera-operator   Active   28s  # 新增
 # 查看pods
 # root@a86:~/documents# kubectl get pods -n tigera-operator
 NAME                              READY   STATUS    RESTARTS   AGE
-tigera-operator-89c775547-mm4zd   1/1     Running   0          84s``` 
+tigera-operator-89c775547-mm4zd   1/1     Running   0          84s
+``` 
 
-3. 部署custom-resources
-修改yaml文件的ip段，同init.yaml的podSubnet
+3. 部署custom-resources    
+修改yaml文件的ip段，和init.yaml的podSubnet保持一致  
 ``` shell 
 # vim custom-resources.yaml
 # cidr: 192.168.0.0/16
@@ -263,10 +304,10 @@ csi-node-driver-slj67                      0/2     ContainerCreating   0        
 csi-node-driver-wqqrm                      0/2     ContainerCreating   0          107s
 csi-node-driver-wwv8s                      0/2     ContainerCreating   0          107s
 ``` 
-漫长等待......
+4. 漫长等待......  
 
 ### 尾声
-1. 查看集群相关的状态
+1. 查看集群相关的状态  
 如下所示，全部成功运行
 ``` shell 
 # root@a86:~/documents/calico# kubectl get pods -n calico-system
