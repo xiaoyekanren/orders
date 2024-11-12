@@ -40,7 +40,7 @@ jps | awk '{print $1}'|xargs kill -9
 ```
 
 
-## 打包client-p
+## 打包client-py
 ```shell
 # 前置条件
 pip install setuptools
@@ -48,8 +48,7 @@ pip install wheel
 
 # mvn编译打包
 # mvn package -pl client-py -am -DskipTests  # old version
-mvn package -pl iotdb-client/client-py -am -DskipTests
-
+mvn clean package -am -pl iotdb-client/client-py -DskipTests
 # 打whl包
 cd iotdb-client/client-py/
 python setup.py bdist_wheel --universal

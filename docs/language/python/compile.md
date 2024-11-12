@@ -32,12 +32,11 @@ make -j8 && make install
 # 安装依赖
 yum install -y epel-release
 yum install -y openssl11-devel zlib zlib-devel readline-devel gcc patch libffi-devel python-devel bzip2-devel ncurses-devel sqlite-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel -y
-# 参数
-# 下载源代码
-# 解压缩
 # 编译
 cd Python-${python_version}
 sed -i 's/PKG_CONFIG openssl /PKG_CONFIG openssl11 /g' configure  # 修改openssl版本
+
+# 其他一致
 ``` 
 
 ps: centos7.9 编译python3.12.4会报错，鬼知道为啥。

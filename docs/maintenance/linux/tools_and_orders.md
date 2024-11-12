@@ -128,9 +128,20 @@ mount /dev/sdx1 /data
 # vim /etc/fstab
 /dev/sdb1	/data	ext4	defaults	0	0
 # 硬盘分区 挂载点 文件系统 挂载选项 dump fsck
-
 ``` 
- - 使用uuid挂载
+|硬盘分区|挂载点|文件系统|挂载选项|备份|启动是否检查|
+|:-|:-|:-|:-|:-|:-|
+|/dev/sdb1|/data|ext4|defaults|0|0|  
+
+ + 挂载选项
+    + defaults 表示使用系统默认的挂载选项，通常包括 rw（读写）、suid（允许执行文件的用户ID和组ID设置）、dev（解释字符或块特殊设备）、exec（允许执行二进制程序）、auto（可以被 mount -a 自动挂载）、nouser（只有超级用户可以挂载文件系统）和 async（所有的 I/O 到文件系统应该是异步的）。  
+    + nodiratime：不更新目录的访问时间。
+    + noatime：不更新文件的访问时间。
+    + 可以写成 defaults,noatime,nodiratime，意思是 使用默认选项，并禁用文件和目录的访问时间更新。
+ + dump：用于备份程序。0 = 不备份；1 = 备份。这个功能现在很少使用。  
+ + fsck 顺序：指定启动时文件系统检查的顺序。0 表示不检查，1 表示首先检查（只有根文件系统 / 设置 1），>= 2 表示多块盘时检查的顺序。  
+
+5. 使用uuid挂载
 ``` shell 
 # 1. 获取UUID
 blkid /dev/sdx1
@@ -138,11 +149,6 @@ blkid /dev/sdx1
 UUID=11234565	/data	ext4	defaults	0	0
 # 硬盘分区UUID 挂载点 文件系统 挂载选项 dump fsck
 ```
-挂载选项：defaults 表示使用系统默认的挂载选项，通常包括 rw（读写）、suid（允许执行文件的用户ID和组ID设置）、dev（解释字符或块特殊设备）、exec（允许执行二进制程序）、auto（可以被 mount -a 自动挂载）、nouser（只有超级用户可以挂载文件系统）和 async（所有的 I/O 到文件系统应该是异步的）。  
-
-dump：用于备份程序。0 = 不备份；1 = 备份。这个功能现在很少使用。  
-
-fsck 顺序：指定启动时文件系统检查的顺序。0 表示不检查，1 表示首先检查（只有根文件系统 / 设置 1），>= 2 表示多块盘时检查的顺序。  
 
 
 ### 外置硬盘
