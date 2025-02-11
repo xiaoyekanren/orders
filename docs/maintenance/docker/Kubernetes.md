@@ -82,12 +82,12 @@ containerd config default > /etc/containerd/config.toml
 # vim /etc/containerd/config.toml
 # sandbox_image = "registry.k8s.io/pause:3.8"
 sandbox_image = "registry.k8s.io/pause:3.9"
+# 或者改国内源，sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.9"
+# pause 镜像是一个非常小的镜像，通常用于 Kubernetes 中作为 Pod 的基础，即根容器
+# 如果安装了k8s v1.3，这里改成pause:3.10
 
 # SystemdCgroup = false
 SystemdCgroup = true
-
-# 改国内源，sandbox_image = "registry.k8s.io/pause:3.9"
-sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.9"
 ```
 
 ### kubectl & kubeadm & kubelet 安装
@@ -113,7 +113,7 @@ cp /etc/default/kubelet  /etc/sysconfig/
 # 2. 增加参数
 # vim /etc/sysconfig/kubelet
 # KUBELET_EXTRA_ARGS=
-KUBELET_EXTRA_ARGS="--cgroup-drver=systemd"
+KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 
 # 3. 开机自启
 systemctl enable kubelet
@@ -137,11 +137,19 @@ kubeadm config images pull
 
 ## 阿里镜像
 kubeadm config images list --image-repository registry.aliyuncs.com/google_containers
-## crictl images
+kubeadm config images pull --image-repository registry.aliyuncs.com/google_containers
+
+# 配置crictl
+# vim /etc/crictl.yaml
+runtime-endpoint: unix:///run/containerd/containerd.sock
+image-endpoint: unix:///run/containerd/containerd.sock
+#  执行crictl images 查看拉取的镜像
+
 ```
 
 ### 集群配置  
 #### 配置文件  
+注意，以下未说明，都是在主节点执行。  
 1. 生成配置文件  
 ``` shell
 kubeadm config print init-defaults > init.yaml
@@ -151,11 +159,11 @@ kubeadm config print init-defaults > init.yaml
 ``` shell
 localAPIEndpoint:
 # advertiseAddress: 1.2.3.4
-advertiseAddress: 172.16.31.86
+advertiseAddress: 172.16.31.86  # master节点的ip
 
 nodeRegistration:
 # name: node
-name: a86
+name: a86  # 当前节点的标识
 
 # imageRepository: registry.k8s.io
 imageRepository: registry.aliyuncs.com/google_containers
@@ -194,20 +202,24 @@ Then you can join any number of worker nodes by running the following on each as
 kubeadm join 172.20.31.86:6443 --token abcdef.0123456789abcdef \
 	--discovery-token-ca-cert-hash sha256:45ce1bdeeb264124fc1b02193e86f37bbdc4
 ```
+里面包含4个事。
+``` shell
+# 1. 设置环境变量，注意普通用户和root用户不一致
+# 2. deploy a pod network
+# 3. 加入集群的方式
+```
 
 4. 拷贝集群配置文件 & 新增环境变量  
 ``` shell
-# 拷贝配置文件
+# 拷贝配置文件(普通用户)
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-# 新增环境变量
+# 新增环境变量(root用户)
 # vim ~/.bashrc
 export KUBECONFIG=/etc/kubernetes/admin.conf
-
-# 使环境变量生效
-source KUBECONFIG=/etc/kubernetes/admin.conf
+source ~/.bashrc
 ```
 
 5. 加入其他节点  
@@ -216,8 +228,7 @@ source KUBECONFIG=/etc/kubernetes/admin.conf
 kubeadm join 172.20.31.86:6443 --token abcdef.0123456789abcdef \
 	--discovery-token-ca-cert-hash sha256:xxxxxx
 ```
-
-6. 查看集群状态  
+通过以下命令查看集群状态：  
 ``` shell
 # 查看节点状态
 # 如下所示， Status是NotReady
@@ -242,8 +253,9 @@ kube-scheduler-a86            1/1     Running   0          13m
 ```
 
 ### calico安装
-文档： https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart  
-版本：3.28  
+即：deploy a pod network to the cluster  
+文档： https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart   
+版本：3.28   
 
 1. 下载yaml  
 ``` shell
