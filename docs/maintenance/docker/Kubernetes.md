@@ -13,12 +13,13 @@
  - overlay: 这是用于 OverlayFS 的模块，Kubernetes 使用它来管理容器文件系统。    
  - br_netfilter: 这是用于支持网络过滤的模块，Kubernetes 需要它来处理网络流量。  
 ``` shell
-# vim /etc/modules-load.d/k8s.conf
+# vim /etc/modules-load.d/k8s.conf 
+# 或者直接写到/etc/modules
 overlay
-bs_netfilter
+br_netfilter
 # 临时生效
 modprobe overlay
-modprobe bs_netfilter
+modprobe br_netfilter
 # 验证
 lsmod | grep -e "overlay" -e "br_netfilter"
 ```
@@ -29,9 +30,14 @@ lsmod | grep -e "overlay" -e "br_netfilter"
  - net.ipv4.ip_forward=1: 允许 IPv4 数据包转发。  
 ``` shell
 # vim /etc/sysctl.d/k8s.conf
+# 或者直接写到/etc/sysctl.conf, 追加到末尾
+
+# k8s
 net.bridge.bridge-nf-call-iptables=1
 net.bridge.bridge-nf-call-ip6tables=1
 net.ipv4.ip_forward=1
+
+# 执行sysctl -p重新加载
 ```
 
 6. 安装ipset和ipvsadm
@@ -40,22 +46,19 @@ apt-get install ipset ipvsadm -y
 
 # 加载模块
 # vim /etc/modules-load.d/ipvs.conf
+# 或者直接写到/etc/modules
 ip_vs
 ip_vs_rr
 ip_vs_wrr
 ip_vs_sh
 nf_conntrack
 
-# 写一个加载脚本
-# vim ~/ipvs.sh
+# 执行以下临时生效
 modprobe -- ip_vs
 modprobe -- ip_vs_rr
 modprobe -- ip_vs_wrr
 modprobe -- ip_vs_sh
 modprobe -- nf_conntrack
-
-# 执行
-/bin/bash ~/ipvs.sh
 
 # 验证
 lsmod | grep -e "ip_vs" -e "nf_conntrack"
