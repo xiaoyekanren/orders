@@ -25,13 +25,14 @@ overlay
 br_netfilter
 ```
 
-执行如下，使模块临时生效：  
+使模块临时生效：  
 ``` shell
 modprobe overlay
 modprobe br_netfilter
 ```
 
-验证是否生效：`lsmod | grep -e "overlay" -e "br_netfilter"`  
+验证是否生效：  
+`lsmod | grep -e "overlay" -e "br_netfilter"`  
 
 #### 1.1.5 开启转发  
 修改文件`/etc/sysctl.conf`, 追加到末尾  
@@ -64,7 +65,7 @@ ip_vs_sh
 nf_conntrack
 ```
 
-执行以下命令使模块临时生效：  
+使模块临时生效：  
 ``` shell
 modprobe -- ip_vs
 modprobe -- ip_vs_rr
@@ -81,7 +82,8 @@ modprobe -- nf_conntrack
 #### 1.2.1 安装  
 无
 #### 1.2.2 生成配置文件  
-使用命令： `containerd config default > /etc/containerd/config.toml`   
+使用命令：   
+`containerd config default > /etc/containerd/config.toml`   
 
 #### 1.2.3 修改配置参数
 编辑文件`/etc/containerd/config.toml`：
@@ -96,18 +98,18 @@ SystemdCgroup = true
 
 pause 镜像是一个非常小的镜像，通常用于 Kubernetes 中作为 Pod 的基础，即根容器。  
 
-2025-02-11：如果安装了k8s v1.3，这里改成pause:3.10，不然后面会报警。  
+> 2025-02-11：如果安装了k8s v1.32，这里改成**pause:3.10**，不然后面会有 warn。  
 
 #### 1.2.4 配置代理
 kubernet拉取镜像，也是用的containerd的代理。  
-
+所以如果网络不好，注意配置containerd的代理。  
 
 ### 1.3 安装 k8s (kubectl & kubeadm & kubelet) 
 
 #### 1.3.1 安装
 使用阿里云的[文档](https://developer.aliyun.com/mirror/kubernetes)来安装最新版，文档里只写到了1.29，实际可通过查看[地址](https://mirrors.aliyun.com/kubernetes-new/core/stable/)，确定最新版本。  
 
-命令如下，注意修改为要安装的版本：  
+命令如下，**注意修改版本**：  
 
 ``` shell
 apt-get update && apt-get install -y apt-transport-https
@@ -130,14 +132,16 @@ apt-mark unhold kubelet kubeadm kubectl
 ```
 
 #### 1.3.3 配置开机自启  
-1. 拷贝配置文件 `cp /etc/default/kubelet  /etc/sysconfig/`
+1. 拷贝配置文件  
+`cp /etc/default/kubelet  /etc/sysconfig/`  
 
-2. 修改文件`/etc/sysconfig/kubelet`
+2. 修改文件`/etc/sysconfig/kubelet`  
 ``` shell
 KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"  # 就一行
 ```
 
-3. 开机自启，`systemctl enable kubelet`
+3. 开机自启  
+`systemctl enable kubelet`  
 
 #### 1.3.4 预下载镜像
 ``` shell
@@ -147,7 +151,7 @@ kubeadm config images list
 kubeadm config images pull
 
 ```
-没有代理的话，可在命令后增加`--image-repository registry.aliyuncs.com/google_containers`使用阿里镜像查看和下载。   
+网络不好的话，使用阿里镜像查看和下载。   
 ``` shell
 # 使用阿里镜像
 kubeadm config images list --image-repository registry.aliyuncs.com/google_containers
@@ -166,9 +170,11 @@ image-endpoint: unix:///run/containerd/containerd.sock
 注意，以下未说明，都是在主节点执行。  
 
 #### 1.4.1 初始化集群  
-1. 使用命令 `kubeadm config print init-defaults > init.yaml` 生成配置文件（使用后可丢弃）。  
+1. 生成配置文件（使用后可丢弃）  
+`kubeadm config print init-defaults > init.yaml`   
 
 2. 修改配置文件 `init.yaml`
+
 ``` shell
 localAPIEndpoint:
 # advertiseAddress: 1.2.3.4
@@ -187,7 +193,9 @@ serviceSubnet: 10.10.0.0/16
 podSubnet: 10.20.0.0/16  # 新增，后续calico用
 ```
 
-3. 执行命令 `kubeadm init --config init.yaml` 初始化集群  
+3. 初始化集群  
+`kubeadm init --config init.yaml`  
+
 > 注意安装完成之后的信息：
 
 ``` shell 
@@ -212,10 +220,10 @@ Then you can join any number of worker nodes by running the following on each as
 kubeadm join 172.20.31.86:6443 --token abcdef.0123456789abcdef \
 	--discovery-token-ca-cert-hash sha256:45ce1bdeeb264124fc1b02193e86f37bbdc4
 ```
-里面包含3个事：
-  1. 设置环境变量，注意普通用户和root用户不一致
-  2. deploy a pod network，例如calico
-  3. 加入集群的命令，注意保存
+里面包含3个事：  
+  1. 设置环境变量，注意普通用户和root用户不一致  
+  2. deploy a pod network，例如calico  
+  3. 加入集群的命令，注意保存  
 
 ##### 1.4.1.1 设置环境变量
 1. 普通用户（拷贝配置文件）
@@ -233,11 +241,9 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 ```
 
 ##### 1.4.1.2 calico安装
-即：deploy a pod network to the cluster  
-参考文档： https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart   
-版本：3.28   
+即：**deploy a pod network to the cluster** ，[参考文档](https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart) 
 
-1. 下载2个yaml文件
+1. 下载2个yaml文件  
 ``` shell
 # tigera-operator
 wget https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/tigera-operator.yaml
@@ -250,28 +256,34 @@ wget https://raw.githubusercontent.com/projectcalico/calico/v3.28.2/manifests/cu
 
 3. 创建 custom-resources  
 
-修改yaml里的`cidr`，和init.yaml的podSubnet保持一致。
+修改yaml里的`cidr`，和文件`init.yaml`的`podSubnet`保持一致。
 
 ``` shell
 # custom-resources.yaml
 cidr: 10.20.0.0/16
 ```
-执行create命令，`kubectl create -f custom-resources.yaml`
+
+执行create命令  
+`kubectl create -f custom-resources.yaml`
 
 ##### 1.4.1.3 加入其他节点  
-安装socat，`apt-get install socat`，否则可能会报错。  
-
 > **注意：只有这一步是要在其他节点执行的，其他全部在主节点执行。**    
+
+安装socat，否则可能会报错。  
+`apt-get install socat`  
+
 ``` shell
 kubeadm join 172.20.31.86:6443 --token abcdef.0123456789abcdef \
 	--discovery-token-ca-cert-hash sha256:xxxxxx
 ```
 
 通过以下命令查看集群状态：  
+当前状态就是NotReady，得后续操作完成之后才会变化。  
+
 ``` shell
 # 查看节点状态
 # 如下所示， Status是NotReady
-# root@a86:/data# kubectl get nodes
+# kubectl get nodes
 NAME   STATUS     ROLES           AGE     VERSION
 a86    NotReady   control-plane   14m     v1.31.1
 a87    NotReady   <none>          3m10s   v1.31.1
@@ -280,18 +292,18 @@ a88    NotReady   <none>          3m      v1.31.1
 
 #### 1.4.2 漫长等待......  
 
-执行如下命令查看状态，直到 pods 全部为 Running。  
+执行如下命令查看状态，直到 pods 全部为 Running，node 全为 Running。  
 
 ```shell
 kubectl get pods -n calico-system
 kubectl get pods -n kube-system
 kubectl get nodes
 ```
-注：kube-system 的 dnscore 依赖 calico。
+> 注：kube-system 的 dnscore 依赖 calico。
 
 如下所示，说明安装完成。
 ``` shell
-# > kubectl get pods -n kube-system
+# kubectl get pods -n kube-system
 NAME                          READY   STATUS    RESTARTS   AGE
 coredns-7c65d6cfc9-kqsjf      1/1     Running   0          37m
 coredns-7c65d6cfc9-vnzln      1/1     Running   0          37m
@@ -303,7 +315,7 @@ kube-proxy-s7k2j              1/1     Running   0          27m
 kube-proxy-s9svg              1/1     Running   0          27m
 kube-scheduler-a86            1/1     Running   0          38m
 
-# > kubectl get pods -n calico-system
+# kubectl get pods -n calico-system
 NAME                                       READY   STATUS    RESTARTS   AGE
 calico-kube-controllers-7c697cc6d9-ld96r   1/1     Running   0          4m17s
 calico-node-7fmck                          1/1     Running   0          4m17s
@@ -315,7 +327,7 @@ csi-node-driver-slj67                      2/2     Running   0          4m17s
 csi-node-driver-wqqrm                      2/2     Running   0          4m17s
 csi-node-driver-wwv8s                      2/2     Running   0          4m17s
 
-# > kubectl get nodes
+# kubectl get nodes
 NAME   STATUS   ROLES           AGE   VERSION
 a86    Ready    control-plane   38m   v1.31.1
 a87    Ready    <none>          27m   v1.31.1
@@ -368,7 +380,7 @@ csi-node-driver-slj67                      0/2     ContainerCreating   0        
 csi-node-driver-wqqrm                      0/2     ContainerCreating   0          107s
 csi-node-driver-wwv8s                      0/2     ContainerCreating   0          107s
 ``` 
-### get pods 时显示详细信息
+### 2.1.3 get pods 时显示详细信息
 
 命令：  
 
