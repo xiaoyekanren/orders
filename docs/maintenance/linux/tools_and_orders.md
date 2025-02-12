@@ -619,14 +619,24 @@ session required pam_limits.so
 ## linux 环境变量加载顺序
 
 1. 全局配置   
-当用户登录时，系统首先执行 /etc/profile。这个文件通常用于设置全局环境变量和启动程序。  
-然后，/etc/profile 可能会调用 /etc/bashrc（或其他配置文件），用于设置交互式 shell 的环境。  
+当用户登录时，系统首先执行 `/etc/profile`。这个文件通常用于设置全局环境变量和启动程序。  
+然后，`/etc/profile` 可能会调用 `/etc/bashrc`（或其他配置文件），用于设置交互式 shell 的环境。  
 
 2. 用户配置
-接下来，用户的个人配置文件 ~/.bash_profile 被执行。这个文件通常用于设置用户的特定环境变量和启动程序。
-~/.bash_profile 可能会调用 ~/.bashrc，以确保交互式 shell 的环境变量和设置都被加载。  
+接下来，用户的个人配置文件 `~/.bash_profile` 被执行。这个文件通常用于设置用户的特定环境变量和启动程序。
+`~/.bash_profile` 可能会调用 `~/.bashrc`，以确保交互式 shell 的环境变量和设置都被加载。  
 
 3. 环境变量覆盖  
-如果在 /etc/profile 和 ~/.bash_profile 中定义了同名的环境变量，后者（即 ~/.bash_profile 中的定义）会覆盖前者。这是因为后加载的变量会替代先加载的变量的值。  
+如果在 `/etc/profile` 和 `~/.bash_profile` 中定义了同名的环境变量，后者（即 `~/.bash_profile` 中的定义）会覆盖前者。这是因为后加载的变量会替代先加载的变量的值。  
 
+
+## apt代理
+`vim /etc/apt/apt.conf.d/proxy.conf`  
+
+``` shell
+Acquire {
+  http::Proxy "http://127.0.0.1:7890/";
+  https::Proxy "http://127.0.0.1:7890/";
+}
+```
 
