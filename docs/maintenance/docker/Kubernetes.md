@@ -395,6 +395,23 @@ spec:
 
 查看随机的端口，使用该端口访问。
 
+4. 创建用户&生成 token  
+
+创建一个服务用户`xiaoye`：  
+`kubectl create serviceaccount xiaoye -n kubernetes-dashboard`  
+
+使用命令查看创建的用户：  
+`kubectl get sa -n kubernetes-dashboard`  
+
+生成这个用户的token（注意保存）：  
+`kubectl -n kubernetes-dashboard create token xiaoye`  
+
+给这个用户授权：  
+``` shell
+kubectl create clusterrolebinding dashboard-admin-binding --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:xiaoye
+```
+
+使用这个token登陆。
 
 
 # 2. 命令
