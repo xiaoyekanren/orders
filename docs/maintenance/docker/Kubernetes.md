@@ -333,6 +333,69 @@ a86    Ready    control-plane   38m   v1.31.1
 a87    Ready    <none>          27m   v1.31.1
 a88    Ready    <none>          27m   v1.31.1
 ```
+### 1.5 插件
+[文档在此。](https://kubernetes.io/zh-cn/docs/tasks/access-application-cluster/web-ui-dashboard/)
+#### 1.5.1 安装 kubernetes-dashboard
+1. 安装helm
+参考[文档](https://helm.sh/zh/docs/intro/install/)。  
+2. 官方命令
+```shell
+# 添加 kubernetes-dashboard 仓库
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+# 使用 kubernetes-dashboard Chart 部署名为 `kubernetes-dashboard` 的 Helm Release
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+```
+
+> 注意执行完成后的输出信息，提示如何开启访问。
+``` shell
+To access Dashboard run:
+  kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+
+NOTE: In case port-forward command does not work, make sure that kong service name is correct.
+      Check the services in Kubernetes Dashboard namespace using:
+        kubectl -n kubernetes-dashboard get svc
+```
+
+3. 开启外网访问。  
+
+> 注意网站是https访问。
+
+有2种方式：
+
+方式一：安装完成后提示的方式，但是需要增加`--address`开放访问，否则只有127.0.0.1。  
+
+这个方式为前台启动，简单调试可以nohup转到后台。  
+
+``` shell
+kubectl -n kubernetes-dashboard port-forward --address 0.0.0.0 svc/kubernetes-dashboard-kong-proxy 8443:443
+
+# port-forward: 启动端口转发。
+# --address 0.0.0.0: 允许从所有网络接口访问该服务。
+# svc/kubernetes-dashboard-kong-proxy: 指定要转发的服务（Service），在这里是 kubernetes-dashboard-kong-proxy。
+# 8443:443: 将本地机器的 8443 端口映射到服务的 443 端口。
+```
+
+方式二：将服务类型更改为 NodePort  
+
+修改文件，执行命令：  
+
+`kubectl -n kubernetes-dashboard edit svc kubernetes-dashboard-kong-proxy`  
+
+将 type 修改为 NodePort，wq退出后自动生效。  
+
+``` shell
+spec:
+  # type: ClusterIP
+  type: NodePort
+```
+
+使用命令：  
+
+`kubectl -n kubernetes-dashboard get svc kubernetes-dashboard-kong-proxy`  
+
+查看随机的端口，使用该端口访问。
+
+
 
 # 2. 命令
 
