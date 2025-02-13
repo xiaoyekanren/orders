@@ -403,7 +403,7 @@ spec:
 使用命令查看创建的用户：  
 `kubectl get sa -n kubernetes-dashboard`  
 
-生成这个用户的token（注意保存）：  
+生成这个用户的token（有效期1小时）：  
 `kubectl -n kubernetes-dashboard create token xiaoye`  
 
 给这个用户授权：  
