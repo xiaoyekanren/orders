@@ -484,5 +484,21 @@ kube-proxy-s9svg              1/1     Running   0          30m   172.20.31.87   
 kube-scheduler-a86            1/1     Running   0          40m   172.20.31.86   a86    <none>           <none>
 ```
 
+### 2.1.4 describe pod
+
+``` shell
+# 状态为 ImagePullBackOff，使用describe
+kubectl describe pod iotdb-operator-controller-manager-xxxxxx -n iotdb-operator-system
+```
+
+### 查看 pod 的实时log
+
+``` shell
+kubectl logs iotdb-operator-controller-manager-xxxxxx -f -n iotdb-operator-system
+
+# -f, 实时显示，类似tail -f
+```
+
+
 ## 2.2 待补充
 无
