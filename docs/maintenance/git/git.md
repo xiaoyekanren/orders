@@ -80,3 +80,9 @@ git push origin --delete refs/tags/${line}
 ``` shell
 git config --global core.autocrlf true
 ```
+
+## 避免每次pull都要密码
+在当前仓库执行，pull一次后即可无需密码   
+```shell
+git config credential.helper store
+```
