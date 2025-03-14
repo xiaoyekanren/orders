@@ -547,7 +547,7 @@ pwdx
 
 ``` shell
 ./configure --prefix=/usr/local/gmp
-make && make install
+make -j$(nproc) && make install
 ```
 
 2. 安装MPFR  
@@ -555,7 +555,7 @@ make && make install
 
 ``` shell
 ./configure --prefix=/usr/local/mpfr --with-gmp=/usr/local/gmp
-make && make install
+make -j$(nproc) && make install
 ```
 
 3. 安装mpc  
@@ -563,14 +563,14 @@ make && make install
 
 ``` shell
 ./configure --prefix=/usr/local/mpc --with-gmp=/usr/local/gmp --with-mpfr=/usr/local/mpfr
-make && make install
+make -j$(nproc) && make install
 ```
 
 4. 安装gcc  
 下载地址：ftp://ftp.gnu.org/gnu/gcc/  
 
 ``` shell
-export LD_LIBRARY_PATH=/usr/local/mpc/lib:/usr/local/gmp/lib:/usr/local/mpfr/lib：$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/mpc/lib:/usr/local/gmp/lib:/usr/local/mpfr/lib:$LD_LIBRARY_PATH
 ./configure --prefix=/usr/local/gcc --enable-threads=posix --disable-checking --disable-multilib --enable-languages=c,c++ --with-gmp=/usr/local/gmp --with-mpfr=/usr/local/mpfr --with-mpc=/usr/local/mpc
 make -j$(nproc)&& make install
 ```
