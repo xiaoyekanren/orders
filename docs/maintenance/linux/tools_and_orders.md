@@ -581,7 +581,13 @@ make -j$(nproc)&& make install
 ln -sf /usr/local/gcc/bin/gcc /usr/bin/gcc
 ln -sf /usr/local/gcc/bin/c++ /usr/bin/c++
 ln -sf /usr/local/gcc/bin/g++ /usr/bin/g++
-ln -sf /usr/local/gcc/lib64/libstdc++.so.6.0.22 /usr/lib64/libstdc++.so.6
+ln -sf /usr/local/gcc/lib64/libstdc++.so.6.0.xx /usr/lib64/libstdc++.so.6
+```
+
+6. 查看glibc版本
+``` shell
+strings /usr/lib64/libstdc++.so.6 | grep "GLIBC"
+
 ```
 
 ## ubuntu-清理多余的内核
