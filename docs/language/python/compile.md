@@ -26,7 +26,11 @@ make -j8 && make install
 
 ## on Centos7
 > apt 和 yum 的包名称不一致。  
-> Centos7无法使用yum安装openssl3，要手动改源代码的openssl版本到1.1。
+
+> Centos7无法使用yum安装openssl3，要手动改源代码的openssl版本到1.1 or 手动编译。 
+
+> 如果手动编译：  
+`./configure`要增加`--with-openssl=/usr/local/openssl`，同时`vim /etc/ld.so.conf.d/openssl.conf`,写入`/usr/local/openssl`，执行`ldconfig`
 
 ``` shell
 # 安装依赖
@@ -35,6 +39,7 @@ yum install -y openssl11-devel zlib zlib-devel readline-devel gcc patch libffi-d
 # 编译
 cd Python-${python_version}
 sed -i 's/PKG_CONFIG openssl /PKG_CONFIG openssl11 /g' configure  # 修改openssl版本
+
 
 # 其他一致
 ``` 
