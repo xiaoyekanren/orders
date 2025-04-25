@@ -1,41 +1,47 @@
 # Git
-1. 获取当前分支的 commit id
+## 获取当前分支的 commit id
 ``` shell
 git rev-parse --short HEAD  # 短
 git rev-parse HEAD  # 完整
 ```
-2. clone 代码到指定文件夹
+
+## clone 代码到指定文件夹
 ``` shell
 git clone https://github.com/xiaoyekanren/scripts.git [path]
 ```
-3. clone 指定分支
+
+## clone 指定分支
 ``` shell
 git clone -b master https://github.com/xiaoyekanren/scripts.git
 ```
-4. tag
+
+## tag
 ``` shell
 git tag -d [tag_name]  # 删除本地tag
 git push origin :refs/tags/[tag_name]  # 删除remote的tag
 ```
-5. git add 的反义词
+
+## git add 的反义词
 ``` shell
 git restore --staged xxx.file
 git rm --cached *
 ```
-6. 修改commit信息
+
+## 修改commit信息
 ``` shell
 # git commit写错了
 git commit --amend
 ```
-7. 删除 git checkout 之后残留的跟当前分支无关的文件夹
+
+## 删除 git checkout 之后残留的跟当前分支无关的文件夹
 ``` shell
 # 清理无法删除的target文件夹
 find ./ -type d -name target | xargs rm -rf
 # git clean，-d删除文件夹，-f强制
 git clean -df
-
 ```
-8. 代理
+
+## 代理
 ``` shell
 # 给当前仓库
 git config https.proxy http://127.0.0.1:7890
@@ -51,3 +57,32 @@ git config --global --unset http.proxy
 git config --global --unset https.proxy
 ```
 
+## 新建仓库之后，本地第一次上传
+``` shell
+git remote add origin https://github.com/xiaoyuekanren/test.git
+git add .
+git commit -m "test"
+git push -u origin master
+```
+
+## 删除远程tag
+``` shell
+# 拉取远程的tag
+git pull 
+# 将当前tag输出到一个文件，删除需要保留的tag
+git tag > abc.txt  
+# 批量删除：shell里面写一个while循环
+cat abc.txt|while read line;do
+git push origin --delete refs/tags/${line}
+```
+
+## Mac/Linux的代码拷贝到Windows发现所有文件被修改
+``` shell
+git config --global core.autocrlf true
+```
+
+## 避免每次pull都要密码
+在当前仓库执行，pull一次后即可无需密码   
+```shell
+git config credential.helper store
+```

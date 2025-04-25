@@ -43,3 +43,56 @@ abc
 ```
 
 
+## 检查变量是否存在
+### 变量
+如果 varName 不为空，则此语句相当于 $varName;  
+如果 varName 未定义，此语句将返回一个错误，并显示“?”定义的错误信息。  
+
+```shell
+# 用于函数内部
+${varName? Error: The varName is not defined}
+# 用于函数外部
+${varName:? Error: The varName is not defined}
+
+# 如果 varName 为空，此语句将返回一个错误，并显示“?”定义的错误信息
+abc=123
+echo ${abc:? Error: no abc.}
+unset abc
+echo ${abc:? Error: no abc.}
+```
+
+
+### if
+
+``` shell
+a=
+if [ ! -n "$a" ]; then  
+echo "IS NULL"
+else
+echo "NOT NULL"
+fi
+#  -n 可加可省略
+``` 
+
+###  test
+
+``` shell
+a=
+if test -z "$a" ; then
+echo "a is not set!"
+else
+echo "a is set !"
+fi
+```
+
+### 空值判断
+
+``` shell
+a=
+if [ "$a" = "" ]; then
+echo "a is not set!"
+else
+echo "a is set !"
+fi
+
+```

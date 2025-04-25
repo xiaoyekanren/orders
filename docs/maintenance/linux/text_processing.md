@@ -12,14 +12,18 @@
 # 将所有的viva替换成sky
 sed -i -e 's/vian/sky/' abc.txt
 
+# 指定行前插入
+sed -i '203i\check_mem' nrpe.cfg
+# 指定行后插入
+sed -i '203a\check_cpu' nrpe.cfg
+
 # 第15行前注释#
 sed -i '15s/^/#/' abc.txt
-
 # 第15行末尾添加” 166.111.80.202”
 sed -i '15s/$/ 166.111.80.202/' abc.txt
 
-# 在倒数第二行插入数据
-sed -i '$i\bbb' abc.txt
+# 查看文件指定行数5-10
+sed -n '5,10p' /etc/passwd 
 ```
 
 扩展使用：
@@ -45,13 +49,23 @@ sed -i 's/\r$//' abc.txt
 
 ## grep
 一般用于过滤文本内容、输出结果。
-``` shell 
-# 查找当前路径下全部文件的文件内容
-grep -rn “文件内容” ./
+``` shell
+grep "被查找的字符串" 文件名
+# –e "正则表达式"
+# –i "不区分大小写"
+# -c "只显示有多少行，不显示内容"
+# –v "输出没有指定字符串的其他行"
 ```
+
 
 扩展命令：
 ``` shell
+# 只列出当前目录的文件夹信息
+ls -l ./ | grep ^d 
+
+# 只列出文件夹那一列
+ls -l ./ | grep ^d | awk '{print $9}'
+
 # 将grep -rnl查询的包含文件内容的文件名列出，并做替换操作
 grep -rnl '8080/ResourceManagement' ./ | xargs sed -i 's/8.5:8080/8.5:18080/g'
 ```
@@ -108,6 +122,23 @@ find . -maxdepth 3 -type f  # 向下最大深度限制为3
 find . -mindepth 2 -type f  # 搜索出深度距离当前目录至少2个子目录的所有文件
 ```
 
+## tail
+``` shell
+# 查看文件后10行
+tail -10 /etc/passwd
+# 或
+tail -n 10 /etc/passwd 
+# 监视某个文件
+tail -f /var/log/messages  # 文件被删除后会报错
+tail -F /var/log/messages  # 文件被删除后，会等待同名文件出现
+```
+
+## head
+``` shell
+查看文件前5行
+head -5 /etc/passwd 
+```
+
 ## cat
 用于显示文件内容。
 ``` shell
@@ -121,7 +152,6 @@ cat filename| head -n 3000 | tail -n +1000
 # tail -n +1000：从1000行开始显示，显示1000行以后的
 # head -n 1000：显示前面1000行
 ```
-
 
 ## cut
 用于拆字符串。

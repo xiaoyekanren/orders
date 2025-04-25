@@ -128,9 +128,20 @@ mount /dev/sdx1 /data
 # vim /etc/fstab
 /dev/sdb1	/data	ext4	defaults	0	0
 # 硬盘分区 挂载点 文件系统 挂载选项 dump fsck
-
 ``` 
- - 使用uuid挂载
+|硬盘分区|挂载点|文件系统|挂载选项|备份|启动是否检查|
+|:-|:-|:-|:-|:-|:-|
+|/dev/sdb1|/data|ext4|defaults|0|0|  
+
+ + 挂载选项
+    + defaults 表示使用系统默认的挂载选项，通常包括 rw（读写）、suid（允许执行文件的用户ID和组ID设置）、dev（解释字符或块特殊设备）、exec（允许执行二进制程序）、auto（可以被 mount -a 自动挂载）、nouser（只有超级用户可以挂载文件系统）和 async（所有的 I/O 到文件系统应该是异步的）。  
+    + nodiratime：不更新目录的访问时间。
+    + noatime：不更新文件的访问时间。
+    + 可以写成 defaults,noatime,nodiratime，意思是 使用默认选项，并禁用文件和目录的访问时间更新。
+ + dump：用于备份程序。0 = 不备份；1 = 备份。这个功能现在很少使用。  
+ + fsck 顺序：指定启动时文件系统检查的顺序。0 表示不检查，1 表示首先检查（只有根文件系统 / 设置 1），>= 2 表示多块盘时检查的顺序。  
+
+5. 使用uuid挂载
 ``` shell 
 # 1. 获取UUID
 blkid /dev/sdx1
@@ -138,11 +149,6 @@ blkid /dev/sdx1
 UUID=11234565	/data	ext4	defaults	0	0
 # 硬盘分区UUID 挂载点 文件系统 挂载选项 dump fsck
 ```
-挂载选项：defaults 表示使用系统默认的挂载选项，通常包括 rw（读写）、suid（允许执行文件的用户ID和组ID设置）、dev（解释字符或块特殊设备）、exec（允许执行二进制程序）、auto（可以被 mount -a 自动挂载）、nouser（只有超级用户可以挂载文件系统）和 async（所有的 I/O 到文件系统应该是异步的）。  
-
-dump：用于备份程序。0 = 不备份；1 = 备份。这个功能现在很少使用。  
-
-fsck 顺序：指定启动时文件系统检查的顺序。0 表示不检查，1 表示首先检查（只有根文件系统 / 设置 1），>= 2 表示多块盘时检查的顺序。  
 
 
 ### 外置硬盘
@@ -376,28 +382,6 @@ taskset -c 0,3,7-11 -p 2726
 lsof |grep deleted
 ```
 
-## 性能测试工具
-### 硬盘测试工具 dd
-
-``` shell
-dd if=/dev/zero of=test1 bs=25MB count=80 oflag=direct   # 写
-dd if=test1 of=/dev/null iflag=direct  # 读
-dd if=/dev/sda of=/testrw.db bs=4k  # 同时读写
-
-if  # 指定读取的文件
-of  # 指定写入的文件
-bs  # 写入&输出的块大小，ibs=读，obs=写
-count  # 写入的块数量
-conv=fsync  # dd命令执行到最后会执行一次sync
-oflag＝direct  # 测速貌似要加这个
-
-#/dev/zero  # 零设备，可提供无限的空字符
-```
-conv=fsync: 表示把文件的“数据”和“metadata”都写入磁盘（metadata包括size、访问时间st_atime & st_mtime等等），因为文件的数据和metadata通常存在硬盘的不同地方，因此fsync至少需要两次IO写操作。 
-
-oflag=dsync 每个block size都单独写一次磁盘，使用同步I/O，去除caching的影响，这是最慢的一种方式，可以当成是模拟数据库插入操作。  
-
-oflag=direct,nonblock 避掉文件系统cache,直接读写,不使用buffer cache
 
 ## 包管理工具
 ### ubuntu - apt
@@ -428,3 +412,237 @@ dpkg -L tree
 cengos7 和 8 都无啦，https://blog.centos.org/2023/04/end-dates-are-coming-for-centos-stream-8-and-centos-linux-7/
 #### 切换国内源
 阿里云源参考地址：https://developer.aliyun.com/mirror/centos/
+
+
+## ssh相关
+### sshpass
+类似于ssh，只是可以指定密码
+```shell
+# 基础使用
+sshpass -p <passowrd> ssh <user>@<ip>
+# 远程执行命令
+sshpass -p <password> ssh <user>@<ip> "whoami"
+```
+
+### rsync
+就是scp plus版本
+```shell
+rsync -avzu -e'ssh -p 55555' /var/lib/mysql ubuntu@192.168.10.10:/mysqlbak
+# 等同于
+scp -P 55555 -r /var/lib/mysql ubuntu@101.6.15.214:/mysqlbak
+```
++ 如果文件过大，需要nohup后台运行的时候，最好是免密验证。
++ 追求速度的话，取消参数z
++ 如果两端有端口有端口映射的情况，建议使用ssh传输，即 -e ssh
+
+``` shell
+参数
+-a, --archive archive mode 权限保存模式,相当于 -rlptgoD 参数，存档，递归，保持属性等
+-z, --compress 压缩模式, 当资料在传送到目的端进行档案压缩
+-v , --verbose 复杂的输出信息
+-u 跳过目标路径较新的文件
+-P 显示传输速度
+--delete， 删除那些目标位置有的文件而备份源没有的文件
+--password-file=FILE ，从 FILE 中得到密码
+```
+
+## 压力测试
+### CPU 计算π
+通过计算π来进行的压力测试。
+``` shell
+# 计算50000位圆周率
+echo "scale=50000; 4*a(1)" | bc -l -q
+
+# scale=50000：设置小数位数。
+# 4*a(1)：使用 bc 的内置函数 a(1) 计算 arctan(1)，即 π / 4 * 4 = π
+# |：管道符，将前面 echo 生成的字符串传递给 bc。
+# bc：一个任意精度的计算器语言。
+# -l：启用数学库，提供数学函数如 a()。
+# -q：安静模式，避免显示启动信息。
+```
+
+### CPU stress
+``` shell
+stress --cpu 8
+```
+
+### 内存 memtester
+使用 memtester 做内存压力测试
+``` shell
+# 安装
+apt-get install memtester -y
+
+# 测试，分配10G内存，测试20次
+memtester 10G 20
+``` 
+
+### CPU温度监控
+``` shell
+# CPU温度监控
+watch -n1 sensors
+
+# CPU主频监控
+watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""
+```
+
+### 硬盘 dd
+使用dd进行磁盘的测试
+``` shell
+dd if=/dev/zero of=test1 bs=25MB count=80 oflag=direct  # 写
+dd if=test1 of=/dev/null iflag=direct  # 读
+dd if=/dev/sda of=/testrw.db bs=4k  # 同时读写
+
+# if：指定读取的文件
+# of：指定写入的文件
+# bs：写入&输出的块大小，ibs=读，obs=写
+# count：写入的块数量
+# conv=fsync：dd命令执行到最后会执行一次sync
+# oflag＝direct：测速貌似要加这个
+# /dev/zero：零设备，可提供无限的空字符
+```
++ conv=fsync: 表示把文件的“数据”和“metadata”都写入磁盘（metadata包括size、访问时间st_atime & st_mtime等等），因为文件的数据和metadata通常存在硬盘的不同地方，因此fsync至少需要两次IO写操作。 
+
++ oflag=dsync 每个block size都单独写一次磁盘，使用同步I/O，去除caching的影响，这是最慢的一种方式，可以当成是模拟数据库插入操作。  
+
++ oflag=direct,nonblock 避掉文件系统cache,直接读写,不使用buffer cache
+
+### 网络 iperf 
+``` shell
+# server
+iperf -s
+
+# client
+iperf -c 192.168.130.13 -i 1 -n 10240000000000
+
+# -c：指定服务器ip
+# -i：指定报告间隔，即每N秒报告一次
+# -n：指定发送包大小，kb
+```
+
+
+## 端口监听 nc
+nc：Netcat 工具，用于读写网络连接。
+
+``` shell
+nc -lk 0.0.0.0 6066
+
+# -l：启用监听模式，等待传入连接。
+# -k：允许 Netcat 在连接关闭后继续监听（保持监听状态）。
+# 0.0.0.0：监听所有可用的网络接口。
+# 6066：指定监听的端口号。
+```
+如上，即可监听本地的6666端口，这时候可以使用telnet，随便输入数据，那边实时接收。
+
+## 查看程序启动路径
+pwdx
+
+
+## gcc
+
+### centos7 升级 gcc
+升级需谨慎。  
+必须按照顺序一个一个编译。  
+1. 安装gmp  
+下载地址：https://gmplib.org/download/gmp/  
+
+``` shell
+./configure --prefix=/usr/local/gmp
+make -j$(nproc) && make install
+```
+
+2. 安装MPFR  
+下载地址：https://www.mpfr.org/mpfr-current  
+
+``` shell
+./configure --prefix=/usr/local/mpfr --with-gmp=/usr/local/gmp
+make -j$(nproc) && make install
+```
+
+3. 安装mpc  
+下载地址：ftp://ftp.gnu.org/gnu/mpc/  
+
+``` shell
+./configure --prefix=/usr/local/mpc --with-gmp=/usr/local/gmp --with-mpfr=/usr/local/mpfr
+make -j$(nproc) && make install
+```
+
+4. 安装gcc  
+下载地址：ftp://ftp.gnu.org/gnu/gcc/  
+
+``` shell
+export LD_LIBRARY_PATH=/usr/local/mpc/lib:/usr/local/gmp/lib:/usr/local/mpfr/lib:$LD_LIBRARY_PATH
+./configure --prefix=/usr/local/gcc --enable-threads=posix --disable-checking --disable-multilib --enable-languages=c,c++ --with-gmp=/usr/local/gmp --with-mpfr=/usr/local/mpfr --with-mpc=/usr/local/mpc
+make -j$(nproc)&& make install
+```
+
+5. 制作软链接  
+
+``` shell
+ln -sf /usr/local/gcc/bin/gcc /usr/bin/gcc
+ln -sf /usr/local/gcc/bin/c++ /usr/bin/c++
+ln -sf /usr/local/gcc/bin/g++ /usr/bin/g++
+ln -sf /usr/local/gcc/lib64/libstdc++.so.6.0.xx /usr/lib64/libstdc++.so.6
+```
+
+6. 查看glibc版本
+``` shell
+strings /usr/lib64/libstdc++.so.6 | grep "GLIBC"
+
+```
+
+## ubuntu-清理多余的内核
+``` shell
+# 查看当前内核
+uname -a
+
+# 查看所有内核
+dpkg --get-selections | grep linux
+
+# 移除多余内核，移除之后给所有内核打上已删除标记
+apt-get remove a b c d
+
+# 删除"已删除标记"
+dpkg --purge `dpkg --get-selections | grep deinstall | cut -f1`
+```
+
+## ubuntu-限制用户登陆
+``` shell
+# 新增参数
+/etc/pam.d/sshd
+文件里有这一行
+session required pam_limits.so
+
+# 增加限制
+/etc/security/limits.conf文件末尾增加：
+# 所有用户单用户登录：
+* - maxlogins 1
+# 指定用户单用户登录：
+@user - maxlogins 1
+
+# 重启服务器
+```
+
+## linux 环境变量加载顺序
+
+1. 全局配置   
+当用户登录时，系统首先执行 `/etc/profile`。这个文件通常用于设置全局环境变量和启动程序。  
+然后，`/etc/profile` 可能会调用 `/etc/bashrc`（或其他配置文件），用于设置交互式 shell 的环境。  
+
+2. 用户配置
+接下来，用户的个人配置文件 `~/.bash_profile` 被执行。这个文件通常用于设置用户的特定环境变量和启动程序。
+`~/.bash_profile` 可能会调用 `~/.bashrc`，以确保交互式 shell 的环境变量和设置都被加载。  
+
+3. 环境变量覆盖  
+如果在 `/etc/profile` 和 `~/.bash_profile` 中定义了同名的环境变量，后者（即 `~/.bash_profile` 中的定义）会覆盖前者。这是因为后加载的变量会替代先加载的变量的值。  
+
+
+## apt代理
+`vim /etc/apt/apt.conf.d/proxy.conf`  
+
+``` shell
+Acquire {
+  http::Proxy "http://127.0.0.1:7890/";
+  https::Proxy "http://127.0.0.1:7890/";
+}
+```
+
