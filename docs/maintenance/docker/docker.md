@@ -15,7 +15,10 @@ docker run -d -p 6667:6667 -p 31999:31999 -p 8181:8181 apache/iotdb:0.12.4-node
 # -i 则让容器的标准输入保持打开。
 
 # 进入容器
-docker exec -it <CONTAINER ID> /bin/bash
+docker exec -it <IMAGE_ID> /bin/bash
+
+# 直接进入一个容器，例如某个操作系统
+docker run -it --entrypoint "/bin/bash" <IMAGE_ID>
 ```
 ### 查看容器详细信息
 ``` shell
