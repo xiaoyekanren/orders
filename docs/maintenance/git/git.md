@@ -83,6 +83,41 @@ git config --global core.autocrlf true
 
 ## 避免每次pull都要密码
 在当前仓库执行，pull一次后即可无需密码   
-```shell
+``` shell
 git config credential.helper store
 ```
+
+
+## fork分支提交的PR有冲突，解决冲突
+
+``` shell
+# 添加一个 upsteram 分支
+git remote add upstream https://github.com/apache/iotdb.git
+
+# 切换到当前仓库的 master
+git checkout master
+
+# 从 upstream 更新 master
+git pull upstream master
+
+# 提交从 upstream 的改动到 remote 上
+git push origin master
+
+# 切换到提交 pr 的分支，例如 aaa
+git checkout aaa
+
+# merge master
+git merge master
+
+# push， 此时会失败
+git push origin zzm
+
+# 重新拉取，此时冲突
+git pull
+
+# 解决冲突
+
+# 再次提交
+git push origin zzm
+```
+
