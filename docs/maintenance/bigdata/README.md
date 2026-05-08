@@ -1,9 +1,6 @@
 ---
-title: Github
+title: 大数据
 index: false
 icon: laptop-code
-# category:
-#   - 使用指南
 ---
-
 <Catalog />
