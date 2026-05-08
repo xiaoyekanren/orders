@@ -68,7 +68,7 @@ sshpass -f ~/.ssh/remote_pass.txt rsync -avz -e "ssh -o StrictHostKeyChecking=no
 
 ``` bash
 for i in {184..206}; do
-  sshpass -p "password" rsync -avzu -e "ssh -o StrictHostKeyChecking=no -p 22" /etc/openvpn/client root@xx.xxx.xx.$i:/etc/openvpn/
+  sshpass -p "password" rsync -avzu -e "ssh -o StrictHostKeyChecking=no -p 22" /etc/openvpn/client root@11.xxx.17.$i:/etc/openvpn/
 done
 ```
 

@@ -18,11 +18,11 @@
  dns server <REDACTED>
  dns server <REDACTED>
  dns server <REDACTED>
- ip host xxxx.xxxxxxx.xxx xxx.xx.xx.xx
- ip host xx.xxxxxxx.xxx xxx.xx.xx.xx
- ip host xxxxxx.xxxxxxx.xxx xxx.xx.xx.xx
- ip host xxxx.xxxxx.xxxxxxx.xxx xxx.xx.xx.xxx
- ip host xxx.xxxxxxx.xxx xxx.xx.xx.xxx
+ ip host chat.timxxho.com 172.xx.31.38
+ ip host ci.timxxho.com 172.xx.31.82
+ ip host gitlab.timxxho.com 172.xx.31.81
+ ip host jira.infra.timxxho.com 172.xx.98.241
+ ip host nas.timxxho.com 172.xx.98.242
 #
  system-working-mode standard
  password-recovery enable
@@ -160,7 +160,7 @@ domain system
 #
  domain default enable system
 #
-local-user xxxxxxx class manage
+local-user timxxho class manage
  password hash <REDACTED>
  service-type telnet http https
  authorization-attribute user-role network-admin
