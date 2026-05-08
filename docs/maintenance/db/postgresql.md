@@ -1,6 +1,10 @@
+---
+category: 数据库
+---
+
 # PostgreSQL
 
-## 简单命令
+## 1. 简单命令
 ``` shell
 # 进入postgresql
 psql -U 用户 -d 数据库
@@ -9,17 +13,16 @@ psql -U 用户 -d 数据库
 \l
 
 # 使用数据库
-\c zzm
 
 # 列出库中的表
 \dt
 
 # 导出表
 pg_dump -U postgres -d zzm -t shsw1701 -f /var/lib/postgresql/results/shsw1701;
-## U 用户
-## d 数据库
-## t 表名
-## f 导出路径
+## 2. U 用户
+## 3. d 数据库
+## 4. t 表名
+## 5. f 导出路径
 
 # 创建表
 CREATE TABLE shsw1701(

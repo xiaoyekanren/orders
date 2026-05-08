@@ -1,7 +1,11 @@
+---
+category: 版本控制
+---
+
 # github action
 
 
-## scp 和 ssh
+## 1. scp 和 ssh
 推荐使用 
 ``` shell
 ssh:

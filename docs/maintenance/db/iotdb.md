@@ -1,6 +1,10 @@
+---
+category: 数据库
+---
+
 # IoTDB
 
-## 配置文件修改
+## 1. 配置文件修改
 ### 关闭合并
 ```shell
 IOTDB_HOME="/data/ubuntu/apache-iotdb-0.14.0-SNAPSHOT-all-bin"
@@ -27,7 +31,7 @@ sed -i -e 's/^# compaction_write_throughput_mb_per_sec=.*/compaction_write_throu
 cat conf/iotdb-common.properties | grep -v '^$' | grep -v '^#.*$'
 ```
 
-## 文件处理
+## 2. 文件处理
 ### 清理全部垃圾文件
 ```shell
 rm -rf LICENSE NOTICE README.md README_ZH.md RELEASE_NOTES.md docs grafana-metrics-example licenses
@@ -40,7 +44,7 @@ jps | awk '{print $1}'|xargs kill -9
 ```
 
 
-## 打包client-py
+## 3. 打包client-py
 ```shell
 # 前置条件
 pip install setuptools
@@ -58,7 +62,26 @@ cd dist
 pip3 install apache_iotdb-*.*.*-*.*-none-any.whl
 ```
 
-## 打包client-cpp
+## 4. 数据同步 (Sync)
+
+1. 接收端 启动pipeserver
+``` shell
+start pipeserver
+```
+2. 发送端 创建pipesink
+``` shell
+CREATE PIPESINK node AS IoTDB (ip='172.20.31.23',port=6670)
+```
+3. 发送端 创建pipe
+``` shell
+create pipe send_to_23 to node23 FROM (select ** from root) with SyncDelOp=true
+```
+4. 发送端 启动pipe
+``` shell
+start pipe send_to_23
+```
+
+## 5. 打包client-cpp
 核心命令
 ``` shell
 ./mvnw clean package -P with-tools,with-cpp -pl iotdb-client/client-cpp,example/client-cpp-example -am -DskipTests

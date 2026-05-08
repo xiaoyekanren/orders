@@ -1,6 +1,10 @@
+---
+category: 常用软件
+---
+
 # OpenVPN
 
-## 名词解释
+## 1. 名词解释
 
 ### 1. 推送域名解析
 
@@ -34,7 +38,7 @@ push "dhcp-option DOMAIN-SEARCH timecho.com"
 push "dhcp-option DOMAIN-SEARCH infra.timecho.com"
 ```
 
-## 疑难杂症
+## 2. 疑难杂症
 
 ### 1. Ubuntu 客户端 DNS 解析问题
 
@@ -67,4 +71,3 @@ script-security 2
 up /etc/openvpn/update-systemd-resolved
 down /etc/openvpn/update-systemd-resolved
 down-pre
-```

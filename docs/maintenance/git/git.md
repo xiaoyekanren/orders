@@ -1,6 +1,10 @@
+---
+category: 版本控制
+---
+
 # Git
 
-## 常规命令
+## 1. 常规命令
 
 ### 1. 获取当前分支的 commit id
 
@@ -53,7 +57,7 @@ git config --global --unset http.proxy
 git config --global --unset https.proxy
 ```
 
-## 稍稍进阶
+## 2. 稍稍进阶
 
 ### 1. git add 的反义词
 
@@ -118,7 +122,7 @@ git pull upstream master
 git push origin master
 ```
 
-## 常见问题
+## 3. 常见问题
 
 ### 1. Mac/Linux的代码拷贝到Windows发现所有文件被修改
 

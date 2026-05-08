@@ -1,3 +1,7 @@
+---
+category: Node.js
+---
+
 # 使用 nvm 管理 node
 
 > 操作系统： m1 pro

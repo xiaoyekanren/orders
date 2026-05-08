@@ -1,28 +1,13 @@
 ---
+layout: BlogHome
 home: true
-title: 这是主页
-heroText: 这是主页
-tagline: 学着吧！
+title: 首页
+heroText: xiaoyekanren
+tagline: 运维 · 开发 · 笔记
 icon: home
+bgImage: /hero-bg.jpg
+bgImageStyle:
+  background-position: center 30%
+heroFullScreen: false
 footer: true
-actions:
-  - text: 运维
-    link: /docs/maintenance/
-    icon: star
-    type: primary
-
-  - text: 语言
-    icon: star
-    link: /docs/language/
-
-features:
-  - title: Docker
-    details: Docker
-    link: /docs/maintenance/container/docker.html
-
-  - title: Linux 常用命令
-    link: /docs/maintenance/linux/tools_and_orders.html
-
-  - title: Linux 文本处理
-    link: /docs/maintenance/linux/text_processing.html
 ---

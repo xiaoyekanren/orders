@@ -1,3 +1,7 @@
+---
+category: Node.js
+---
+
 # 简单命令
 1. npm设置源
 ``` shell

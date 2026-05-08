@@ -1,3 +1,7 @@
+---
+category: Python
+---
+
 # 功能点
 
 ## try、except 抛出异常 赋予 给变量

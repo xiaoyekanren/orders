@@ -1,4 +1,5 @@
 ---
+category: 常用软件
 createTime: 2025-11-20
 ---
 
@@ -187,7 +188,7 @@ clamdscan --move=/var/quarantine /path/to/scan
 ```
 
 
-## 4.3 脚本
+## 5. 脚本
 
 ``` shell
 #!/bin/bash
@@ -220,7 +221,7 @@ echo "扫描结束: $(date)" | tee -a $LOG_FILE
 
 ```
 
-## 4.4 本地病毒库镜像源
+## 6. 本地病毒库镜像源
 参考[官方文档](https://docs.clamav.net/appendix/CvdPrivateMirror.html)安装。
 
 ### 4.4.1 安装

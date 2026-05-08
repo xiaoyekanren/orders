@@ -1,6 +1,10 @@
+---
+category: 容器化
+---
+
 # Containerd
 
-## 安装相关
+## 1. 安装相关
 20240924: 发现可以在github直接下载二进制包，https://github.com/containerd/containerd/releases  
 ### 安装
 如下步骤安装即可

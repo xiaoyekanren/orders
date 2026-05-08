@@ -1,10 +1,14 @@
+---
+category: 版本控制
+---
+
 # 批量注册 GitLab Runner
 
-## 背景
+## 1. 背景
 
 在 ESXi 上使用 Ubuntu 24.04.3 作为基础系统，拷贝多份作为独立 gitlab-runner。但所有机器的 `system_id` 一致，无法用一个 token 同时添加。
 
-## 解决方案
+## 2. 解决方案
 
 ### 重新生成 machine-id
 
@@ -43,4 +47,3 @@ gitlab-runner unregister --name <name>
 
 # 3. 重启 gitlab-runner
 systemctl restart gitlab-runner
-```

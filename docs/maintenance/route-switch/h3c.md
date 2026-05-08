@@ -1,6 +1,10 @@
+---
+category: 路由交换
+---
+
 # H3C 常用命令
 
-## 通用
+## 1. 通用
 
 ``` shell
 # 显示 IP 地址
@@ -14,7 +18,7 @@ dis mac-address
 dis mac-address interface GigabitEthernet1/0/5
 ```
 
-## AC 控制器
+## 2. AC 控制器
 
 ``` shell
 # 列出全部 AP
@@ -26,13 +30,13 @@ probe
 wlan ap-execute all exec-console enable
 ```
 
-## AP 默认密码
+## 3. AP 默认密码
 
 ```
 xxxxxxxxxx
 ```
 
-## 增加 SSID 不生效
+## 4. 增加 SSID 不生效
 
 确保以下步骤均执行：
 
@@ -54,15 +58,14 @@ xxxxxxxxxx
 4. **途经的全部交换机**
    - 增加 VLAN
 
-## 恢复出厂设置
+## 5. 恢复出厂设置
 
 ``` shell
 restore factory-default
 ```
 
-## 切换到瘦模式
+## 6. 切换到瘦模式
 
 ``` shell
 probe
 ap-mode fit
-```

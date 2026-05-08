@@ -1,3 +1,7 @@
+---
+category: 容器化
+---
+
 # Kubernetes
 ## 1. 安装
  - 记录安装日期：2024-09-24   
@@ -416,7 +420,7 @@ kubectl create clusterrolebinding dashboard-admin-binding --clusterrole=cluster-
 
 # 2. 命令
 
-## 2.1 基础命令
+## 2. 基础命令
 
 ### 2.1.1 查看命名空间
 
@@ -500,5 +504,5 @@ kubectl logs iotdb-operator-controller-manager-xxxxxx -f -n iotdb-operator-syste
 ```
 
 
-## 2.2 待补充
+## 3. 待补充
 无

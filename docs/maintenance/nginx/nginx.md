@@ -1,6 +1,10 @@
+---
+category: 常用软件
+---
+
 # Nginx
 
-## build in ubuntu
+## 1. build in ubuntu
 ``` shell
 apt-get install gcc g++ make libssl-dev openssl libpcre3 libpcre3-dev zlib1g zlib1g-dev libgd-dev -y
 ./configure --prefix=/usr/local/nginx-binary \

@@ -1,13 +1,17 @@
+---
+category: 数据库
+---
+
 # MySQL
 
-## 修改root密码
+## 1. 修改root密码
 ``` shell
 use mysql;
 update user set password=password("123456") where user="root";
 flush privileges;
 ```
 
-## root允许远程访问
+## 2. root允许远程访问
 ``` shell
 use mysql;
 update user set host='%' where user='root';
@@ -19,7 +23,7 @@ select User,Host from mysql.user;
 # 若有root，localhost，确认下权限是不是all
 ```
 
-## 导出数据+结构
+## 3. 导出数据+结构
 ``` shell
 # 单表
 mysqldump -uroot -p123456 flok_app >flok_app
@@ -31,7 +35,7 @@ mysqldump -uroot -p --all-databases ./all_db.sql
 mysql -uroot -p flok_app < flok_app
 ```
 
-## Linux-忘记Mysql密码
+## 4. Linux-忘记Mysql密码
 ``` shell
 # 1. 停止mysql服务
 # 2. 跳过验证登陆
@@ -46,7 +50,7 @@ update user set password=password("new_pass") where user="root";
 flush privileges;
 ```
 
-## 设置全局变量
+## 5. 设置全局变量
 当前server生效，重启server失效。  
 ``` shell
 # 查询timeout相关的全局变量：

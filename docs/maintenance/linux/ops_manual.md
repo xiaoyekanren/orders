@@ -1,55 +1,10 @@
-# 常用工具和命令
+---
+category: Linux
+---
 
-## 查看 系统/硬件 信息
+# 运维手册
 
-### 查看内存
-``` shell
-# 查看内存详细信息
-dmidecode -t memory
-# 显示插槽的使用情况
-dmidecode|grep -P -A5 "Memory\s+Device"|grep Size|grep -v Range
-# 显示最大支持内存数量
-dmidecode | grep -P 'Maximum\s+Capacity'
-# 查看内存频率
-dmidecode|grep -A16 "Memory Device"
-dmidecode|grep -A16 "Memory Device"|grep 'Speed'
- ```
-
-### 查看网卡
-查看当前网卡是千兆还是百兆
-``` shell
-ethtool eth1
-```
-
-### 查看硬盘
-``` shell
-# 机械硬盘
-apt-get install smartmontools -y
-smartctl --all /dev/sda
-
-# nvme
-apt-get install nvme-cli
-nvme list
-
-# 查看分区
-lsblk
-```
-
-### 查看操作系统版本
-``` shell
-# Centos
-cat /etc/redhat-release
-# Ubuntu
-cat /etc/issue
-lsb_release -a
-```
-
-### 查看操作系统内核版本
-``` shell
-uname -a
-```
-
-##  swap相关
+## 1. swap 管理
 
 ### 删除swap
 
@@ -84,7 +39,7 @@ swapon --show
 ```
 
 
-## 清理 cache
+## 2. 清理 cache
 在 Linux 系统中，内存管理是通过内核自动完成的。内核会将未使用的内存用作缓存（cache）和缓冲区（buffers）以提高系统性能。缓存和缓冲区是用来临时存储数据，以便快速访问。
 
 缓存（Cache）：通常指的是用来存储读取的文件系统数据的内存区域。当文件被读取时，它们的数据会被存储在缓存中，以便下次访问时能更快地读取。
@@ -100,7 +55,7 @@ echo 2 > /proc/sys/vm/drop_caches  # 清理目录项和inode缓存
 echo 3 > /proc/sys/vm/drop_caches  # 清理页缓存，目录项和inode缓存
 ```
 
-## 挂载
+## 3. 挂载
 ### 挂载新硬盘，分区 & 格式化
 1. 使用parted分区
 ``` shell
@@ -154,26 +109,19 @@ UUID=11234565	/data	ext4	defaults	0	0
 ### 外置硬盘
 ``` shell
 # 挂载光盘
-ls -l /dev | grep cdrom  # 查看当前光盘
-mount /dev/cdrom1 /mnt/gp  #  将光盘cdrom1挂载到/mnt/gp下
+ls -l /dev | grep cdrom  # 查看当前光盘
+mount /dev/cdrom1 /mnt/gp  #  将光盘cdrom1挂载到/mnt/gp下
 
 # 挂载 windows 共享硬盘
 mount -t cifs -o username=administrator,password='123' //192.168.1.181/share /share
 ```
 
-## 虚拟机不重启添加磁盘
+## 4. 虚拟机不重启添加磁盘
 ``` shell 
 for i in `ls /sys/class/scsi_host/*/scan`; do echo "- - -" > $i; done
 ```
 
-## 显卡 GPU
-``` shell 
-# 查看是否有nvidia的GPU
-lspci | grep -i nvidia
-```
-
-
-## sudo 权限
+## 5. sudo 权限
 给普通用户 sudo 权限，使其当前命令可以以 root 权限来运行。
 编辑文件 ```/etc/sudoers```。
 ``` shell
@@ -183,7 +131,7 @@ ubuntu	ALL=(ALL:ALL) ALL
 ubuntu ALL=(ALL) NOPASSWD:ALL
 ```
 
-## 网卡配置
+## 6. 网卡配置
 ### ubuntu16
 ``` shell
 # vim /etc/network/interfices
@@ -246,14 +194,14 @@ network:
 ```
 
 
-## 临时修改dns
+## 7. 临时修改dns
 重启网卡失效！重启失效！重启失效！
 ``` shell
 # vim /etc/resolv.conf
 nameserver 114.114.114.114
 ```
 
-## 防火墙
+## 8. 防火墙
 ### centos
 ``` shell
 # 启停
@@ -294,7 +242,7 @@ ufw status numbered  # 查看规则的index编号
 ufw delete [1]  # 按照编号删除规则
 ```
 
-## ulimit 相关
+## 9. ulimit 相关
 ulimit 用于控制用户级别的资源限制
 
 ``` shell
@@ -324,66 +272,7 @@ ulimit -n 102400
 注2：ubuntu20上，* 不包含root，root需指定root才生效。  
 注3：通过 SSH 登录的用户，确保 sshd 守护进程配置中的 UsePAM 设置为 yes，否则不生效。
 
-## 进程绑定CPU
-taskset 用于设置或查找一个进程的 CPU 亲和性。  
-``` shell
-# 指定pid，查看该pid所绑定CPU
-taskset -p 2726
-
-# 启动程序时绑定CPU
-taskset -c 1 sleep 3  # 在CPU1上运行sleep 3秒
-
-# 改变现有程序绑定的CPU，两种写法都行
-taskset -pc 0,3,7-11 2726
-taskset -c 0,3,7-11 -p 2726
-
-```
-补充：查看绑定CPU的输出结果是十六进制，要将这个值转成二进制，之后从右往左每一位数代表一个CPU，值1表示该pid允许在该CPU运行，值0表示不允许。  
-例如1：返回5，二进制是101，CPU0、CPU2允许运行，CPU1不允许运行。  
-例如2：返回4，二进制是100，只允许在CPU2上运行。  
-例如3：返回f，二进制是1111，允许在CPU0-3上执行。  
-
-
-## 压缩
-### tar
-
-### gzip
-
-### zip/unzip
-
-### 7z
-需要安装，安装方式```sudo apt-get install p7zip-full -y```
-
-
-``` shell
-# 压缩
-7z a archive.7z file1 file2 dir1/
-# a：压缩
-# archive.7z：压缩后的文件名
-# "file1 file2 dir1/"：压缩的内容
-
-#  解压缩
-7z x archive.7z
-# x：解压缩
-
-# 其他命令：
-# l：表示列出压缩包内容，L的小写
-# t：验证文件完整性
-
-# 其他参数：
-# -o./：指定路径(后无空格)
-# -t7z，指定压缩格式7z(后无空格)
-```
-
-## lsof
-### 查看已经删除，尚未释放的文件
-可以看到被打上deleted的文件，在pid被关闭的时候就会释放。用于debug删除文件但是磁盘空间未释放。
-``` shell
-lsof |grep deleted
-```
-
-
-## 包管理工具
+## 10. 包管理工具
 ### ubuntu - apt
 
 #### 查看使用apt安装的文件的位置
@@ -413,133 +302,240 @@ cengos7 和 8 都无啦，https://blog.centos.org/2023/04/end-dates-are-coming-f
 #### 切换国内源
 阿里云源参考地址：https://developer.aliyun.com/mirror/centos/
 
+## 11. 清理多余的内核
+``` shell
+# 查看当前内核
+uname -a
 
-## ssh相关
-### sshpass
-类似于ssh，只是可以指定密码
-```shell
-# 基础使用
-sshpass -p <passowrd> ssh <user>@<ip>
-# 远程执行命令
-sshpass -p <password> ssh <user>@<ip> "whoami"
+# 查看所有内核
+dpkg --get-selections | grep linux
+
+# 移除多余内核，移除之后给所有内核打上已删除标记
+apt-get remove a b c d
+
+# 删除"已删除标记"
+dpkg --purge `dpkg --get-selections | grep deinstall | cut -f1`
 ```
 
-### rsync
-就是scp plus版本
-```shell
-rsync -avzu -e'ssh -p 55555' /var/lib/mysql ubuntu@192.168.10.10:/mysqlbak
-# 等同于
-scp -P 55555 -r /var/lib/mysql ubuntu@101.6.15.214:/mysqlbak
+## 12. 限制用户登录
+``` shell
+# 新增参数
+/etc/pam.d/sshd
+文件里有这一行
+session required pam_limits.so
+
+# 增加限制
+/etc/security/limits.conf文件末尾增加：
+# 所有用户单用户登录：
+* - maxlogins 1
+# 指定用户单用户登录：
+@user - maxlogins 1
+
+# 重启服务器
 ```
-+ 如果文件过大，需要nohup后台运行的时候，最好是免密验证。
-+ 追求速度的话，取消参数z
-+ 如果两端有端口有端口映射的情况，建议使用ssh传输，即 -e ssh
+
+## 13. apt 代理
+`vim /etc/apt/apt.conf.d/proxy.conf`  
 
 ``` shell
-参数
--a, --archive archive mode 权限保存模式,相当于 -rlptgoD 参数，存档，递归，保持属性等
--z, --compress 压缩模式, 当资料在传送到目的端进行档案压缩
--v , --verbose 复杂的输出信息
--u 跳过目标路径较新的文件
--P 显示传输速度
---delete， 删除那些目标位置有的文件而备份源没有的文件
---password-file=FILE ，从 FILE 中得到密码
+Acquire {
+  http::Proxy "http://127.0.0.1:7890/";
+  https::Proxy "http://127.0.0.1:7890/";
+}
 ```
 
-## 压力测试
-### CPU 计算π
-通过计算π来进行的压力测试。
-``` shell
-# 计算50000位圆周率
-echo "scale=50000; 4*a(1)" | bc -l -q
+## 14. 故障排查
 
-# scale=50000：设置小数位数。
-# 4*a(1)：使用 bc 的内置函数 a(1) 计算 arctan(1)，即 π / 4 * 4 = π
-# |：管道符，将前面 echo 生成的字符串传递给 bc。
-# bc：一个任意精度的计算器语言。
-# -l：启用数学库，提供数学函数如 a()。
-# -q：安静模式，避免显示启动信息。
+### 硬盘故障，/dev/sd* recovering journal
+开启无法进系统，报错 ```/dev/sdx recovering journal```，如下图：  
+![alt text](img/20240716001920.webp) 
+多半是这块硬盘出问题了，输入root密码登录进去。  
+ - 不是系统盘，可以在 ```/etc/fstab``` 下注释掉对应的挂载行。  
+ - 是系统盘，考虑使用 ```fstab -y /``` 来尝试修复。  
+ - 都不行，尝试关掉自检 ```tune2fs –c 0 –i 0 /dev/sdx``` 在重启。
+
+
+### ubuntu 进入单用户模式
+``` shell
+# 1. 重启
+reboot
+
+# 2. 等待grub出现，出现后立刻按esc使其停止计时
+
+# 3. 选择ubuntu系统，按e编辑启动参数
+
+# 4. 找到以 linux 开头的行，移动行尾，一般是 quiet splash
+
+# 5. 添加 systemd.unit=rescue.target，统使用 systemd 的紧急救援目标来启动。
+
+# 6. 按 Ctrl + X 来启动系统
+
+# 7. 输入 root 用户的密码进入单用户模式，这是一个最小的 shell 环境。
+
+# 8. 完事后 reboot 重启
 ```
 
-### CPU stress
+## 15. Systemd 服务配置
+
+### .service 配置文件参数
+
+服务文件分为 `[Unit]`、`[Service]`、`[Install]` 三个区块。
+
+#### [Unit] 区块
+
+| 参数 | 作用 | 示例 |
+|------|------|------|
+| Description | 服务描述 | `Description=Disk Usage Monitor Service` |
+| Documentation | 文档链接 | `Documentation=man:df(1)` |
+| After | 在指定单元之后启动 | `After=network.target mysql.service` |
+| Before | 在指定单元之前启动 | `Before=nginx.service` |
+| Requires | 强依赖，失败则停止当前服务 | `Requires=mysql.service` |
+| Wants | 弱依赖，失败不影响当前服务 | `Wants=logrotate.service` |
+| Conflicts | 冲突关系，禁止同时运行 | `Conflicts=apache2.service` |
+
+#### [Service] 区块
+
+| 参数 | 作用 | 示例 |
+|------|------|------|
+| Type | 服务类型 | `simple`/`forking`/`oneshot` |
+| ExecStart | 启动命令 | `ExecStart=/usr/bin/myapp` |
+| ExecStop | 停止命令 | `ExecStop=/bin/kill $MAINPID` |
+| Restart | 重启策略 | `always`/`on-failure`/`no` |
+| RestartSec | 重启间隔 | `RestartSec=5` |
+| User | 运行用户 | `User=nobody` |
+| WorkingDirectory | 工作目录 | `WorkingDirectory=/opt/app` |
+
+#### [Install] 区块
+
+| 参数 | 作用 | 示例 |
+|------|------|------|
+| WantedBy | 安装到哪个 target | `WantedBy=multi-user.target` |
+| RequiredBy | 强依赖此服务 | `RequiredBy=network.target` |
+
+### 常用命令
+
 ``` shell
-stress --cpu 8
+# 重载配置
+systemctl daemon-reload
+
+# 启用开机自启
+systemctl enable myapp
+
+# 禁用开机自启
+systemctl disable myapp
+
+# 查看状态
+systemctl status myapp
+
+# 查看日志
+journalctl -u myapp
 ```
 
-### 内存 memtester
-使用 memtester 做内存压力测试
+## 16. CentOS 7 升级 glibc
+
+> torch > 2.5.1 不再支持旧版 glibc，需升级到 2.28。
+
+### 查看当前版本
+
 ``` shell
-# 安装
-apt-get install memtester -y
-
-# 测试，分配10G内存，测试20次
-memtester 10G 20
-``` 
-
-### CPU温度监控
-``` shell
-# CPU温度监控
-watch -n1 sensors
-
-# CPU主频监控
-watch -n1 "cat /proc/cpuinfo | grep \"^[c]pu MHz\""
+strings /lib64/libc.so.6 | grep ^GLIBC_
 ```
 
-### 硬盘 dd
-使用dd进行磁盘的测试
-``` shell
-dd if=/dev/zero of=test1 bs=25MB count=80 oflag=direct  # 写
-dd if=test1 of=/dev/null iflag=direct  # 读
-dd if=/dev/sda of=/testrw.db bs=4k  # 同时读写
+### 步骤
 
-# if：指定读取的文件
-# of：指定写入的文件
-# bs：写入&输出的块大小，ibs=读，obs=写
-# count：写入的块数量
-# conv=fsync：dd命令执行到最后会执行一次sync
-# oflag＝direct：测速貌似要加这个
-# /dev/zero：零设备，可提供无限的空字符
-```
-+ conv=fsync: 表示把文件的“数据”和“metadata”都写入磁盘（metadata包括size、访问时间st_atime & st_mtime等等），因为文件的数据和metadata通常存在硬盘的不同地方，因此fsync至少需要两次IO写操作。 
-
-+ oflag=dsync 每个block size都单独写一次磁盘，使用同步I/O，去除caching的影响，这是最慢的一种方式，可以当成是模拟数据库插入操作。  
-
-+ oflag=direct,nonblock 避掉文件系统cache,直接读写,不使用buffer cache
-
-### 网络 iperf 
-``` shell
-# server
-iperf -s
-
-# client
-iperf -c 192.168.130.13 -i 1 -n 10240000000000
-
-# -c：指定服务器ip
-# -i：指定报告间隔，即每N秒报告一次
-# -n：指定发送包大小，kb
-```
-
-
-## 端口监听 nc
-nc：Netcat 工具，用于读写网络连接。
+#### 1. 切换阿里云源
 
 ``` shell
-nc -lk 0.0.0.0 6066
-
-# -l：启用监听模式，等待传入连接。
-# -k：允许 Netcat 在连接关闭后继续监听（保持监听状态）。
-# 0.0.0.0：监听所有可用的网络接口。
-# 6066：指定监听的端口号。
+cd /etc/yum.repos.d
+rm -rf *
+curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo
+yum clean all && yum makecache
 ```
-如上，即可监听本地的6666端口，这时候可以使用telnet，随便输入数据，那边实时接收。
 
-## 查看程序启动路径
-pwdx
+#### 2. 安装依赖
 
+``` shell
+yum install vim wget texinfo -y
+yum groupinstall "Development tools" -y
+```
 
-## gcc
+#### 3. 安装 devtoolset-8（gcc 8）
 
-### centos7 升级 gcc
+CentOS 官方源已失效，使用阿里云源：
+
+``` shell
+cat > /etc/yum.repos.d/CentOS-scl.repo << EOF
+[centos-sclo-rh]
+name=CentOS-7 - SCLo rh
+baseurl=https://mirrors.aliyun.com/centos/7/sclo/x86_64/rh/
+gpgcheck=0
+enabled=1
+EOF
+
+yum clean all && yum makecache
+yum install scl-utils scl-utils-build -y
+yum install devtoolset-8-gcc devtoolset-8-gcc-c++ devtoolset-8-binutils -y
+
+# 验证
+scl enable devtoolset-8 bash
+gcc --version
+```
+
+#### 4. 升级 make（需要 4.0 - 4.4）
+
+``` shell
+wget http://ftp.gnu.org/pub/gnu/make/make-4.3.tar.gz
+tar zxvf make-4.3.tar.gz
+cd make-4.3
+./configure --prefix=/usr/local/make_4_3
+make -j$(nproc) && make install
+
+export PATH=/usr/local/make_4_3/bin:$PATH
+```
+
+#### 5. 编译 glibc-2.28
+
+``` shell
+wget http://ftp.gnu.org/pub/gnu/glibc/glibc-2.28.tar.gz
+tar zxvf glibc-2.28.tar.gz
+cd glibc-2.28
+mkdir build && cd build
+
+scl enable devtoolset-8 bash
+MAKE=/usr/local/make_4_3/bin/make ../configure \
+  --prefix=/usr/local/glibc_2_28 \
+  --with-headers=/usr/include \
+  --enable-shared \
+  --enable-static \
+  --disable-werror \
+  --disable-tests \
+  --enable-stack-protector=strong
+
+MAKE=/usr/local/make_4_3/bin/make make -j$(nproc) && MAKE=/usr/local/make_4_3/bin/make make install
+```
+
+### 常见问题
+
+#### 重启后 locale 警告
+
+```
+-bash: warning: setlocale: LC_TIME: cannot change locale (en_US.UTF-8)
+```
+
+解决：
+``` shell
+localedef -i en_US -f UTF-8 en_US.UTF-8
+```
+
+### 注意事项
+
+- glibc 是核心库，升级可能导致系统不稳定
+- 建议使用容器或虚拟机运行需要新版 glibc 的应用
+- 可通过 `patchelf` 修改应用的 RPATH 使用独立安装的 glibc
+
+## 17. CentOS 7 升级 gcc
+
 升级需谨慎。  
 必须按照顺序一个一个编译。  
 1. 安装gmp  
@@ -587,62 +583,4 @@ ln -sf /usr/local/gcc/lib64/libstdc++.so.6.0.xx /usr/lib64/libstdc++.so.6
 6. 查看glibc版本
 ``` shell
 strings /usr/lib64/libstdc++.so.6 | grep "GLIBC"
-
 ```
-
-## ubuntu-清理多余的内核
-``` shell
-# 查看当前内核
-uname -a
-
-# 查看所有内核
-dpkg --get-selections | grep linux
-
-# 移除多余内核，移除之后给所有内核打上已删除标记
-apt-get remove a b c d
-
-# 删除"已删除标记"
-dpkg --purge `dpkg --get-selections | grep deinstall | cut -f1`
-```
-
-## ubuntu-限制用户登陆
-``` shell
-# 新增参数
-/etc/pam.d/sshd
-文件里有这一行
-session required pam_limits.so
-
-# 增加限制
-/etc/security/limits.conf文件末尾增加：
-# 所有用户单用户登录：
-* - maxlogins 1
-# 指定用户单用户登录：
-@user - maxlogins 1
-
-# 重启服务器
-```
-
-## linux 环境变量加载顺序
-
-1. 全局配置   
-当用户登录时，系统首先执行 `/etc/profile`。这个文件通常用于设置全局环境变量和启动程序。  
-然后，`/etc/profile` 可能会调用 `/etc/bashrc`（或其他配置文件），用于设置交互式 shell 的环境。  
-
-2. 用户配置
-接下来，用户的个人配置文件 `~/.bash_profile` 被执行。这个文件通常用于设置用户的特定环境变量和启动程序。
-`~/.bash_profile` 可能会调用 `~/.bashrc`，以确保交互式 shell 的环境变量和设置都被加载。  
-
-3. 环境变量覆盖  
-如果在 `/etc/profile` 和 `~/.bash_profile` 中定义了同名的环境变量，后者（即 `~/.bash_profile` 中的定义）会覆盖前者。这是因为后加载的变量会替代先加载的变量的值。  
-
-
-## apt代理
-`vim /etc/apt/apt.conf.d/proxy.conf`  
-
-``` shell
-Acquire {
-  http::Proxy "http://127.0.0.1:7890/";
-  https::Proxy "http://127.0.0.1:7890/";
-}
-```
-
