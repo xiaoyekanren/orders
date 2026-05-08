@@ -10,7 +10,7 @@
 用于替换文本。
 ```shell
 # 将所有的viva替换成sky
-sed -i -e 's/vian/sky/' abc.txt
+sed -i -e 's/vian/sky/' abc.txt
 
 # 指定行前插入
 sed -i '203i\check_mem' nrpe.cfg
