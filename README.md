@@ -18,7 +18,7 @@ actions:
 features:
   - title: Docker
     details: Docker
-    link: /docs/maintenance/docker/docker.html
+    link: /docs/maintenance/container/docker.html
 
   - title: Linux 常用命令
     link: /docs/maintenance/linux/tools_and_orders.html
