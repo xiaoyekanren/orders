@@ -236,6 +236,7 @@ curl -s -X POST -u "用户名:API_TOKEN" \
 - POST config.xml 时必须带 Jenkins-Crumb（GET 不需要）
 - 必须删除 XML 中的 `<actions>` 节点，否则返回 500
 - `<authToken>` 是 Remote Build Trigger 的 token，和 GitLab Plugin 的 `<secretToken>` 是两回事
+- 提交包含中文的 config.xml 时，需指定 `Content-Type: application/xml; charset=utf-8`，否则中文会乱码
 
 ### 2.2 GitLab 端配置
 
@@ -333,6 +334,7 @@ GitLab UI → Settings → Webhooks → 点击 **Edit** → 查看 **Recent even
 
 | 现象 | 原因 | 解决方法 |
 |------|------|---------|
+| 401 Invalid token | Secret Token 不匹配 | 确认 GitLab webhook 的 `token` 与 Jenkins GitLabPushTrigger 的 `secretToken` 完全一致 |
 | 403 anonymous is missing permission | Webhook URL 错误（混用了 /project/ 和 /build?token=） | URL 改为 `/project/JOB_NAME`，去掉 `/build?token=` |
 | 201 但没有触发构建 | 分支不匹配 | 检查 Jenkins 的 `includeBranchesSpec` 和 GitLab 的 `push_events_branch_filter` |
 | 404 | Job 名称不对 | 检查 URL 中的 Job 名称是否与 Jenkins 完全一致（区分大小写） |
@@ -340,6 +342,7 @@ GitLab UI → Settings → Webhooks → 点击 **Edit** → 查看 **Recent even
 | Webhook 显示为 disabled | 连续失败次数过多被 GitLab 自动禁用 | 修复后在 GitLab webhook 页面重新启用 |
 | Jenkins 500 (API 更新配置时) | XML 中包含 `<actions>` 节点 | 上传前删除 `<actions>...</actions>` |
 | Jenkins 403 (API 更新配置时) | 缺少 CSRF Crumb | POST 请求添加 `Jenkins-Crumb` Header |
+| 飞书通知 Bad Request | Pipeline 中 shell 引号嵌套导致 JSON 格式错误 | 使用 `writeFile` + `curl -d @file` 代替直接拼接 JSON（见下方说明） |
 
 ---
 
@@ -366,16 +369,20 @@ pipeline {
         }
         stage('Notify') {
             steps {
-                sh '''
-                    curl -X POST -H "Content-Type: application/json" \
-                        -d '{"msg_type":"text","content":{"text":"构建完成通知"}}' \
-                        https://open.feishu.cn/open-apis/bot/v2/hook/<飞书机器人ID>
-                '''
+                script {
+                    def msg = '构建完成通知\n项目: ' + env.JOB_NAME + '\n构建号: #' + env.BUILD_NUMBER
+                    def payload = '{"msg_type":"text","content":{"text":"' + msg + '"}}'
+                    writeFile file: 'feishu.json', text: payload, encoding: 'UTF-8'
+                    sh "curl -s -X POST -H 'Content-Type: application/json; charset=utf-8' -d @feishu.json 'https://open.feishu.cn/open-apis/bot/v2/hook/<飞书机器人ID>'"
+                }
             }
         }
     }
 }
 ```
+
+> **注意**：不要在 `sh` 中直接拼接 JSON 字符串，shell 引号嵌套极易导致格式错误（尤其是包含中文时）。
+> 推荐使用 `writeFile` 写入 JSON 文件，再用 `curl -d @filename` 发送。
 
 ### GitLab Webhook 配置
 
