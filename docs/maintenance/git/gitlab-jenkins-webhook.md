@@ -336,6 +336,7 @@ GitLab UI → Settings → Webhooks → 点击 **Edit** → 查看 **Recent even
 |------|------|---------|
 | 401 Invalid token | Secret Token 不匹配 | 确认 GitLab webhook 的 `token` 与 Jenkins GitLabPushTrigger 的 `secretToken` 完全一致 |
 | 403 anonymous is missing permission | Webhook URL 错误（混用了 /project/ 和 /build?token=） | URL 改为 `/project/JOB_NAME`，去掉 `/build?token=` |
+| 403 首次成功后续全部失败 | Pipeline `triggers{}` 块未指定 `secretToken`，每次构建后被清空 | 在 `triggers { gitlab(...) }` 中加 `secretToken: 'xxx'`（见下方说明） |
 | 201 但没有触发构建 | 分支不匹配 | 检查 Jenkins 的 `includeBranchesSpec` 和 GitLab 的 `push_events_branch_filter` |
 | 404 | Job 名称不对 | 检查 URL 中的 Job 名称是否与 Jenkins 完全一致（区分大小写） |
 | SSL 证书错误 | 内部 CA 不被信任 | GitLab webhook 设置中取消 SSL verification |
@@ -343,6 +344,39 @@ GitLab UI → Settings → Webhooks → 点击 **Edit** → 查看 **Recent even
 | Jenkins 500 (API 更新配置时) | XML 中包含 `<actions>` 节点 | 上传前删除 `<actions>...</actions>` |
 | Jenkins 403 (API 更新配置时) | 缺少 CSRF Crumb | POST 请求添加 `Jenkins-Crumb` Header |
 | 飞书通知 Bad Request | Pipeline 中 shell 引号嵌套导致 JSON 格式错误 | 使用 `writeFile` + `curl -d @file` 代替直接拼接 JSON（见下方说明） |
+
+---
+
+### 重点：Declarative Pipeline `triggers` 块会重写触发器（secretToken 被清空）
+
+这是最隐蔽的坑。表现为 **webhook 首次成功，后续全部 403**。
+
+**原理**：Declarative Pipeline 引擎在每次构建成功后，会按 `triggers {}` 块的声明重写 Job 的触发器配置。如果 `triggers` 块没有指定 `secretToken`，重写时就会把 secretToken 清空为 null。
+
+```
+首次构建前: secretToken = "abc123" (通过 UI/API 设置)
+     ↓ 构建成功
+Pipeline 引擎: 按 triggers{} 声明重写触发器
+     ↓ triggers{} 里没有 secretToken
+secretToken = null
+     ↓ 下次 webhook
+GitLab 发送 X-Gitlab-Token: abc123 → Jenkins 比对 null → 认证失败 → 403
+```
+
+**正确写法**：在 `triggers` 块中显式指定 `secretToken`：
+
+```groovy
+triggers {
+    gitlab(
+        triggerOnPush: true,
+        branchFilterType: 'NameBasedFilter',
+        includeBranchesSpec: 'master',
+        secretToken: 'your-secret-token'    // 必须加这一行
+    )
+}
+```
+
+**排查口诀**：看到 403 且构建历史显示"只有第一次是 webhook 触发，后面全是手动触发"，立刻检查 Pipeline `triggers` 块有没有写 `secretToken`。
 
 ---
 
